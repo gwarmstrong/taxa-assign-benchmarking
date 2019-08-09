@@ -15,14 +15,14 @@ rule all:
 
 rule allplots:
     input:
-        abserrorplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.genus.abserrorplot.ext", 
+        abserrorplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.genus.abserrorplot.ext",
         profilecorrplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.genus.profilecorrplot.ext"
     output:
         "analyses/{simname}/{datetime}_sample_{sample_num}.done"
     shell:
         "touch analyses/{wildcards.simname}/{wildcards.datetime}_sample_{wildcards.sample_num}.done"
 
-rule abserrorplot:
+rule absolute_error_plot:
     input:
         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.abserror.txt"
     output:
@@ -33,8 +33,7 @@ rule abserrorplot:
         touch analyses/{wildcards.simname}/plots/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.abserrorplot.ext
         """
 
-
-rule profilecorrplot:
+rule profile_correlation_plot:
     input:
         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.profilecorr.txt"
     output:
@@ -45,16 +44,23 @@ rule profilecorrplot:
         touch analyses/{wildcards.simname}/plots/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profilecorrplot.ext
         """
 
-rule benchmarkerrors:
+rule benchmark_absolute_error:
     input:
-        true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-        obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.genus.profile.txt", method=METHODS)
+         true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
+         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.genus.profile.txt", method=METHODS)
     output:
-        abserror = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.abserror.txt",
-        profilecorr = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.profilecorr.txt"
+          abserror = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.abserror.txt",
     run:
-       abserror.profile(input.obs_profiles, input.true_profile, output.abserror) 
-       profilecorr.profile(input.obs_profiles, input.true_profile, output.profilecorr) 
+        abserror.profile(input.obs_profiles, input.true_profile, output.abserror)
+
+rule benchmark_profile_correlation:
+    input:
+         true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
+         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.genus.profile.txt", method=METHODS)
+    output:
+          profilecorr = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.profilecorr.txt"
+    run:
+        profilecorr.profile(input.obs_profiles, input.true_profile, output.profilecorr)
 
 rule kraken2:
     input:
