@@ -61,6 +61,8 @@ rule kraken2:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq"
     output:
         "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}.genus.profile.txt"
+    conda:
+        "envs/taxa-benchmark.yml"
     shell:
         "touch analyses/{wildcards.simname}/profiles/kraken2/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profile.txt"
 
@@ -69,6 +71,8 @@ rule metaphlan2:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq"
     output:
         "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}.genus.profile.txt"
+    conda:
+        "envs/taxa-benchmark.yml"
     shell:
         "touch analyses/{wildcards.simname}/profiles/metaphlan2/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profile.txt"
 
@@ -77,6 +81,11 @@ rule shogun:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq"
     output:
         "analyses/{simname}/profiles/shogun/{datetime}_sample_{sample_num}.genus.profile.txt"
+    conda:
+        "envs/taxa-benchmark.yml"
     shell:
         "touch analyses/{wildcards.simname}/profiles/shogun/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profile.txt"
 
+# rule kraken2_transformer
+# rule metaphlan2_transformer
+# rule shogun_transformer
