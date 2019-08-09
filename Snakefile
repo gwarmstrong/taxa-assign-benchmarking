@@ -56,14 +56,6 @@ rule benchmarkerrors:
        abserror.profile(input.obs_profiles, input.true_profile, output.abserror) 
        profilecorr.profile(input.obs_profiles, input.true_profile, output.profilecorr) 
 
-#     shell:
-#         """
-#         python scripts/abserror.py --i-predicted-profiles {input.obs_profiles} --i-true-profile {input.true_profile} --o-abserror {output.abserror}
-#         python scripts/profilecorr.py --i-predicted-profiles {input.obs_profiles} --i-true-profile {input.true_profile} --o-profile-corr {output.abserror}
-#         touch analyses/{wildcards.simname}/summaries/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.abserror.txt
-#         touch analyses/{wildcards.simname}/summaries/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profilecorr.txt
-#         """
-
 rule kraken2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq"
