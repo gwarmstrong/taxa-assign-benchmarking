@@ -1,0 +1,11 @@
+channels:
+  - conda-forge
+  - bioconda
+  - knights-lab
+  - defaults
+dependencies:
+  - burst=0.99.7f
+  - kraken2=2.0.8_beta
+  - metaphlan2=2.9.19
+  - numpy=1.17.0
+  - python=3.6.7
