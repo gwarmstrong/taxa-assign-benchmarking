@@ -1,4 +1,4 @@
-from benchutils import abserror, profilecorr
+from benchutils import metrics, plotting
 
 (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq")
 
@@ -27,22 +27,16 @@ rule absolute_error_plot:
         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.abserror.txt"
     output:
         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.genus.abserrorplot.ext"
-    shell:
-        """
-        python scripts/abserrorplot.py -i {input} -o {output}
-        touch analyses/{wildcards.simname}/plots/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.abserrorplot.ext
-        """
+    run:
+        plotting.absolute_error_plot(input, output)
 
 rule profile_correlation_plot:
     input:
         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.profilecorr.txt"
     output:
         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.genus.profilecorrplot.ext"
-    shell:
-        """
-        python scripts/profilecorrplot.py -i {input} -o {output}
-        touch analyses/{wildcards.simname}/plots/{wildcards.datetime}_sample_{wildcards.sample_num}.genus.profilecorrplot.ext
-        """
+    run:
+        plotting.correlation_plot(input, output)
 
 rule benchmark_absolute_error:
     input:
@@ -51,7 +45,7 @@ rule benchmark_absolute_error:
     output:
           abserror = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.abserror.txt",
     run:
-        abserror.profile(input.obs_profiles, input.true_profile, output.abserror)
+        metrics.absolute_error(input.obs_profiles, input.true_profile, output.abserror)
 
 rule benchmark_profile_correlation:
     input:
@@ -60,7 +54,7 @@ rule benchmark_profile_correlation:
     output:
           profilecorr = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.genus.profilecorr.txt"
     run:
-        profilecorr.profile(input.obs_profiles, input.true_profile, output.profilecorr)
+        metrics.correlation(input.obs_profiles, input.true_profile, output.profilecorr)
 
 rule kraken2:
     input:
