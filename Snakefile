@@ -53,11 +53,11 @@ rule profile_correlation_plot:
 rule benchmark_absolute_error:
     input:
          true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", method=METHODS, rank=RANKS)
+         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
     output:
           abserror = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.abserror.txt",
     run:
-        metrics.absolute_error(input.obs_profiles, input.true_profile, output.abserror)
+        metrics.absolute_error(input.obs_profiles, input.true_profile, output.abserror, wildcards.rank)
 
 rule benchmark_profile_correlation:
     input:
@@ -66,7 +66,7 @@ rule benchmark_profile_correlation:
     output:
           profilecorr = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.profilecorr.txt"
     run:
-        metrics.correlation(input.obs_profiles, input.true_profile, output.profilecorr)
+        metrics.correlation(input.obs_profiles, input.true_profile, output.profilecorr, wildcards.rank)
 
 rule kraken2_rank:
     input:
@@ -74,7 +74,7 @@ rule kraken2_rank:
     output:
         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
-        transformers.kraken2_all_to_rank(input, output, ranks=RANKS)
+        transformers.kraken2_all_to_rank(str(input), output, ranks=RANKS)
 
 rule kraken2_all:
     input:
