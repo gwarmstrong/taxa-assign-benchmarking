@@ -1,13 +1,7 @@
 import os
+import pandas as pd
+from benchutils import ranks
 from numpy.linalg import norm
-
-
-def absolute_error(observed_file, expected_file, rank):
-    pass
-
-
-def correlation(observed_file, expected_file, rank):
-    pass
 
 
 def l2_loss(observed_file, expected_file, rank):
@@ -53,11 +47,22 @@ def profile_error(observed_file, expected_file, output_file, rank, metric,
     load_observed_profile(observed_file, method=method)
     load_expected_profile(expected_file)
 
+
+def absolute_error(observed_file, expected_file, output_file, rank):
+    # TODO use rank to subset the expected true profile
+    if rank not in ranks:
+        raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
+
     if metric in available_metrics:
         results = available_metrics[metric](observed_file, expected_file, rank)
     else:
         raise ValueError('Metric \'{}\' is not in available metrics.')
 
+    os.system('touch {}'.format(output_file))
     # TODO can delete the touch if real writing has been written
+
+def correlation(observed_file, expected_file, output_file, rank):
+    if rank not in ranks:
+        raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
     os.system('touch {}'.format(output_file))
     write_results(results, output_file)
