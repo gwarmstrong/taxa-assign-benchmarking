@@ -3,21 +3,20 @@ import pandas as pd
 from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
+from scipy.stats import pearsonr
 
 
 def rmse(observed, expected):
     # see https://stackoverflow.com/questions/21926020/how-to-calculate-rmse
     #  -using-ipython-numpy
-    predictions = observed.values().flatten()
-    targets = expected.values().flatten()
+    predictions = observed.values.flatten()
+    targets = expected.values.flatten()
     return np.sqrt(np.mean((predictions - targets) ** 2))
 
 
 def correlation(observed, expected):
-    print(observed)
-    print(expected)
-    return np.corrcoef(observed.values.flatten(),
-                       expected.values.flatten())[1, 0]
+    return pearsonr(observed.values.flatten(),
+                    expected.values.flatten())[0]
 
 
 def l2_loss(observed, expected):
