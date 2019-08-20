@@ -31,7 +31,8 @@ def kraken2_all_to_rank(all_rank_summary, output_rank_summaries, ranks):
     -------
 
     """
-    # TODO COULD be split into two format functions: one to reformat, and one to split on rank
+    # TODO COULD be split into two format functions: one to reformat,
+    #  and one to split on rank
     # TODO give error for invalid rank value
     all_ranks = pd.read_csv(all_rank_summary, sep='\t')
     all_ranks.columns = kraken_columns
