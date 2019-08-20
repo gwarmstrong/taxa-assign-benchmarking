@@ -74,7 +74,7 @@ rule kraken2_rank:
     output:
         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
-        transformers.kraken2_all_to_rank(str(input), output, ranks=RANKS)
+        transformers.kraken2_transformer(str(input), output, ranks=RANKS)
 
 rule kraken2_all:
     input:
