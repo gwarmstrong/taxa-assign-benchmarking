@@ -25,8 +25,8 @@ rule all:
 
 rule allplots:
     input:
-        abserrorplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.abserrorplot.ext",
-        profilecorrplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.profilecorrplot.ext"
+        absolute_errorplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext",
+        correlationplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
     output:
         "analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.done"
     shell:
@@ -36,17 +36,17 @@ rule allplots:
 
 rule absolute_error_plot:
     input:
-        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.abserror.txt"
+        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt"
     output:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.abserrorplot.ext"
+        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext"
     run:
         plotting.absolute_error_plot(input, output)
 
 rule profile_correlation_plot:
     input:
-        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.profilecorr.txt"
+        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
     output:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.profilecorrplot.ext"
+        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
     run:
         plotting.correlation_plot(input, output)
 
@@ -55,18 +55,18 @@ rule benchmark_absolute_error:
          true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
          obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
     output:
-          abserror = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.abserror.txt",
+          absolute_error = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt",
     run:
-        metrics.absolute_error(input.obs_profiles, input.true_profile, output.abserror, wildcards.rank)
+        metrics.profile_error(input.obs_profiles, input.true_profile, output.absolute_error, wildcards.rank, methods=METHODS, metric='absolute_error')
 
 rule benchmark_profile_correlation:
     input:
          true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", method=METHODS, rank=RANKS)
+         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
     output:
-          profilecorr = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.profilecorr.txt"
+          correlation = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
     run:
-        metrics.correlation(input.obs_profiles, input.true_profile, output.profilecorr, wildcards.rank)
+        metrics.profile_error(input.obs_profiles, input.true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
 
 rule kraken2_rank:
     input:
