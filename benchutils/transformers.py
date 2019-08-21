@@ -16,9 +16,9 @@ kraken_columns = ['PERCENTAGE', 'lca_read_count', 'read_count', 'rank',
                   '@@TAXID', 'TAXNAME']
 
 
-def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
+def kraken2_all_to_rank(all_rank_summary, output_rank_summaries, ranks):
     # TODO finsih docs
-    """Converts a s from kraken into a profile
+    """Converts a summary of all ranks from kraken into rank-wise profiles
     similar to the CAMI-SIM output
 
     Parameters
@@ -42,7 +42,7 @@ def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
     all_ranks['RANK'] = [kraken_rank_dictionary[key] for key in
                          all_ranks['rank']]
     keep_cols = ['@@TAXID', 'RANK', 'TAXNAME', 'PERCENTAGE']
-    # for output_, rank in zip(output_rank_summaries, ranks):
-        # sub_df = all_ranks.loc[all_ranks['RANK'] == rank]
-    sub_df_matching = all_ranks[keep_cols]
-    sub_df_matching.to_csv(output_, sep='\t', index=False)
+    for output_, rank in zip(output_rank_summaries, ranks):
+        sub_df = all_ranks.loc[all_ranks['RANK'] == rank]
+        sub_df_matching = sub_df[keep_cols]
+        sub_df_matching.to_csv(output_, sep='\t', index=False)

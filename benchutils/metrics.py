@@ -36,6 +36,7 @@ def get_column_name(prefix, suffix):
 #  same parser
 def _load_df(file_, rank, suffix, prefix='', skiprows=0):
     df = pd.read_csv(file_, sep='\t', skiprows=skiprows)
+    # TODO note that rank is chosen already by kraken
     df = df.loc[df['RANK'] == rank]
     df['@@TAXID'] = df['@@TAXID'].astype(int)
     df = df.set_index('@@TAXID')
