@@ -4,6 +4,7 @@ from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
 from scipy.stats import pearsonr
+from itertools import combinations
 
 
 def rmse(observed, expected):
@@ -54,7 +55,7 @@ def load_observed_single_profile(observed_file, rank, suffix, prefix=''):
 def load_observed_profiles(observed_files, rank, methods, prefix=''):
     # merge a bunch of dataframes loaded with `load_observed_single_profile
     dfs = []
-    for observed_file, method in zip(observed_files, methods):
+    for observed_file, method in combinations(observed_files, methods):
         dfs.append(load_observed_single_profile(observed_file,
                                                 rank,
                                                 suffix=method,
@@ -76,6 +77,12 @@ def profile_error(observed_files, expected_file, output_file, rank,
 
     if rank not in ranks:
         raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
+
+    if isinstance(observed_files, str):
+        observed_files = [observed_files]
+
+    if isinstance(methods, str):
+        methods = [methods]
 
     observed_profiles = load_observed_profiles(observed_files, rank,
                                                methods)  # ,

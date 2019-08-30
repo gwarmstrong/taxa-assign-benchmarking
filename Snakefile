@@ -66,7 +66,13 @@ rule benchmark_profile_correlation:
     output:
           correlation = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
     run:
-        metrics.profile_error(input.obs_profiles, input.true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
+        if not isinstance(input.obs_profiles, list):
+            obs_profiles = [input.obs_profiles]
+        else:
+            obs_profiles = input.obs_profiles
+        obs_profiles = [str(profile) for profile in obs_profiles]
+        true_profile = str(input.true_profile)
+        metrics.profile_error(obs_profiles, true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
 
 rule kraken2_rank:
     input:
