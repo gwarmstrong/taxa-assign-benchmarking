@@ -4,7 +4,7 @@ from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
 from scipy.stats import pearsonr
-from itertools import combinations
+from itertools import product
 
 
 def rmse(observed, expected):
@@ -55,7 +55,7 @@ def load_observed_single_profile(observed_file, rank, suffix, prefix=''):
 def load_observed_profiles(observed_files, rank, methods, prefix=''):
     # merge a bunch of dataframes loaded with `load_observed_single_profile
     dfs = []
-    for observed_file, method in combinations(observed_files, methods):
+    for observed_file, method in product(observed_files, methods):
         dfs.append(load_observed_single_profile(observed_file,
                                                 rank,
                                                 suffix=method,
