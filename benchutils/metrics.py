@@ -78,8 +78,10 @@ def profile_error(observed_files, expected_file, output_file, rank,
     if rank not in ranks:
         raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
 
-    if isinstance(observed_files, str):
-        observed_files = [observed_files]
+    if not isinstance(observed_files, list):
+        observed_files = [str(observed_files)]
+    else:
+        observed_files = [str(file_) for file_ in observed_files]
 
     if isinstance(methods, str):
         methods = [methods]
