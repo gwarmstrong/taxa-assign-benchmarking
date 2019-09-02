@@ -25,7 +25,7 @@ def l2_norm(observed, expected):
 
 def auprc(observed, expected):
     # TODO make actual function for calculating
-    return pd.Series(np.zeros(len(observed.values.flatten())))
+    return 0
 
 
 def get_column_name(prefix, suffix):
