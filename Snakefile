@@ -8,6 +8,8 @@ filename = "medium_anon_reads.fq"
 
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
+METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
+
 # TODO auprc vs. l2 score curve 
 # TODO benchmarks for memory/time
 
@@ -25,8 +27,7 @@ rule all:
 
 rule allplots:
     input:
-        absolute_errorplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext",
-        correlationplot = "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
+        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}plot.ext", metric=METRICS)
     output:
         "analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.done"
     shell:
@@ -34,45 +35,50 @@ rule allplots:
         touch {output}
         """
 
-rule absolute_error_plot:
-    input:
-        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt"
-    output:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext"
-    run:
-        plotting.absolute_error_plot(input, output)
+# rule absolute_error_plot:
+#     input:
+#         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt"
+#     output:
+#         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext"
+#     run:
+#         plotting.absolute_error_plot(input, output)
+#
+# rule profile_correlation_plot:
+#     input:
+#         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
+#     output:
+#         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
+#     run:
+#         plotting.correlation_plot(input, output)
 
-rule profile_correlation_plot:
+rule plotting:
     input:
-        "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
+        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRICS)
     output:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
+        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}plot.ext", metric=METRICS)
     run:
-        plotting.correlation_plot(input, output)
+        for metric_file in zip(input, output):
+            plotting.correlation_plot(metric_file, input)
 
-rule benchmark_absolute_error:
-    input:
-         true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
-    output:
-          absolute_error = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt",
-    run:
-        metrics.profile_error(input.obs_profiles, input.true_profile, output.absolute_error, wildcards.rank, methods=METHODS, metric='absolute_error')
 
-rule benchmark_profile_correlation:
+rule benchmark_metrics:
     input:
-         true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
+        true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
+        obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
     output:
-          correlation = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
+        absolute_error = expand("analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt", expand=METRICS)
     run:
-        if not isinstance(input.obs_profiles, list):
-            obs_profiles = [input.obs_profiles]
-        else:
-            obs_profiles = input.obs_profiles
-        obs_profiles = [str(profile) for profile in obs_profiles]
-        true_profile = str(input.true_profile)
-        metrics.profile_error(obs_profiles, true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
+        for metric in METRICS:
+            metrics.profile_error(input.obs_profiles, input.true_profile, output.absolute_error, wildcards.rank, methods=METHODS, metric=metric)
+
+# rule benchmark_profile_correlation:
+#     input:
+#          true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
+#          obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
+#     output:
+#           correlation = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
+#     run:
+#         metrics.profile_error(obs_profiles, true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
 
 # TODO make one rule for running program and transforming output
 rule kraken2_transformer:
