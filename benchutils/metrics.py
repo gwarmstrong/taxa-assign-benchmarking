@@ -106,10 +106,12 @@ def profile_error(observed_files, expected_file, output_file, rank,
     # maybe map and add to a series
     if metric in available_metrics:
         func = available_metrics[metric]
-        results = map(lambda x: func(observed_profiles[x], expected_profile),
-                      observed_profiles.columns)
+        # results = map(lambda x: func(observed_profiles[x], expected_profile),
+        #               observed_profiles.columns)
         # results = available_metrics[metric](observed_profiles,
         #                                     expected_profile)
+        results = [func(observed_profiles[x], expected_profile) for x in
+                   observed_profiles.columns]
         results = pd.Series(results, name=metric,
                             index=observed_profiles.columns)
     else:
