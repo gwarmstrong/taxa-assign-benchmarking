@@ -59,7 +59,7 @@ def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
         sub_df_matching.to_csv(output_, sep='\t', index=False)
 
 
-def metaphlan2_transfomer(all_rank_summary, output_rank_summaries, ranks):
+def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
     all_ranks = pd.read_csv(all_rank_summary, sep='\t', skiprows=3)
     def last_entry(x): return x.split('|')[-1]
     all_ranks['last_clade'] = all_ranks['#clade_name'].map(last_entry)
