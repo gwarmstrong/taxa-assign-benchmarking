@@ -72,6 +72,7 @@ def write_results(results: pd.Series, output_file):
     results.to_csv(output_file, sep='\t')
 
 
+# TODO unit test locally
 def profile_error(observed_files, expected_file, output_file, rank,
                   methods, metric):
 

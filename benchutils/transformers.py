@@ -15,8 +15,9 @@ kraken_rank_dictionary = {
 kraken_columns = ['PERCENTAGE', 'lca_read_count', 'read_count', 'rank',
                   '@@TAXID', 'TAXNAME']
 
+
 #  Order: o__, Family: f__, Genus: g__, Species: s__]
-def kraken2_all_to_rank(all_rank_summary, output_rank_summaries, ranks):
+def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
     # TODO finsih docs
     """Converts a summary of all ranks from kraken into rank-wise profiles
     similar to the CAMI-SIM output

@@ -6,7 +6,7 @@ from benchutils import metrics, plotting, transformers
 filename = "medium_anon_reads.fq"
 (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename)
 
-METHODS = ["kraken2", "metaphlan2", "shogun"]
+METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
 # TODO auprc vs. l2 score curve 
 # TODO benchmarks for memory/time
@@ -74,27 +74,28 @@ rule benchmark_profile_correlation:
         true_profile = str(input.true_profile)
         metrics.profile_error(obs_profiles, true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
 
-rule kraken2_rank:
-    input:
-        "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
-    output:
-        expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
-    run:
-        transformers.kraken2_transformer(str(input), output, ranks=RANKS)
+# TODO make one rule for running program and transforming output
+# rule kraken2_rank:
+#     input:
+#         "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
+#     output:
+#         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
+#     run:
+#         transformers.kraken2_transformer(str(input), output, ranks=RANKS)
 
-rule kraken2_all:
+rule kraken2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
     output:
-        "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
+        all = "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
+        ranks = expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     conda:
         "envs/taxa-benchmark.yml"
-    shell:
-        # TODO filter for given level (should maybe be a seperate step)
-        """
-        kraken2 --db {config[kraken_db]} --use-names --report {output} {input} 
-        """
+    run:
+        shell("kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}")
+        transformers.kraken2_transformer(str(output.all), output.ranks, ranks=RANKS)
 
+# TODO transformer
 rule metaphlan2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
