@@ -6,7 +6,7 @@ from benchutils import metrics, plotting, transformers
 filename = "medium_anon_reads.fq"
 (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename)
 
-METHODS = ["kraken2"] #"metaphlan2"] # "shogun"]
+METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
 # TODO auprc vs. l2 score curve 
 # TODO benchmarks for memory/time
@@ -81,7 +81,7 @@ rule kraken2_transformer:
     output:
         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
-        transformers.kraken2_transformer(str(input), output, ranks=RANKS)
+        transformers.kraken2_transformer(input, output, ranks=RANKS)
 
 rule kraken2:
     input:
@@ -94,22 +94,29 @@ rule kraken2:
         "kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}"
 
 # TODO transformer
+rule metaphlan2_transformer:
+    input:
+        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
+    output:
+        expand("analyses/{{simname}}/profiles/metaphlan2/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+    run:
+        transformers.metaphlan2_transformer(input, output, ranks=RANKS)
+
+
 rule metaphlan2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
     output:
-        expand("analyses/{{simname}}/profiles/metaphlan2/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
     resources:
         mem_gb=64
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        # TODO add ability to change desired taxa level
-        # may need to remove old metaphlan bowtie indices
         """
         rm -f {input}.bowtie2out.txt
-        # touch {output}
-        metaphlan2.py {input} --input_type fastq --tax_lev 'g' > {output}        
+        # compute metaphlan2 output for all tax levels
+        metaphlan2.py {input} --input_type fastq --tax_lev 'a' > {output}        
         """
 
 rule shogun:
