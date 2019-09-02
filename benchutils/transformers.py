@@ -66,7 +66,7 @@ def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
     all_ranks['@@TAXID'] = all_ranks['NCBI_tax_id'].map(last_entry)
     all_ranks['RANK'] = all_ranks['last_clade'].map(
         lambda x: greengenes_rank_dict[x[:3]])
-    all_ranks['TAXNAME'] = all_ranks['low_clade'].map(lambda x: x[3:])
+    all_ranks['TAXNAME'] = all_ranks['last_clade'].map(lambda x: x[3:])
 
     keep_cols = ['@@TAXID', 'RANK', 'TAXNAME', 'PERCENTAGE']
     for output_, rank in zip(output_rank_summaries, ranks):
