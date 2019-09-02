@@ -4,7 +4,6 @@ from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
 from scipy.stats import pearsonr
-from itertools import product
 
 
 def rmse(observed, expected):
@@ -110,14 +109,6 @@ def profile_error(observed_files, expected_file, output_file, rank,
     # maybe map and add to a series
     if metric in available_metrics:
         func = available_metrics[metric]
-        # results = map(lambda x: func(observed_profiles[x], expected_profile),
-        #               observed_profiles.columns)
-        # results = available_metrics[metric](observed_profiles,
-        #                                     expected_profile)
-        # results = [func(observed_profiles[x], expected_profile) for x in
-        #            observed_profiles.columns]
-        print(expected_profile.shape)
-        print(next(observed_profiles.iteritems())[1].shape)
         results = [func(profile, expected_profile) for _, profile in
                    observed_profiles.iteritems()]
         results = pd.Series(results, name=metric,
