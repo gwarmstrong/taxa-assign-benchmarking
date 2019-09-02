@@ -81,7 +81,7 @@ rule kraken2_transformer:
     output:
         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
-        transformers.kraken2_transformer(input, output, ranks=RANKS)
+        transformers.kraken2_transformer(str(input), output, ranks=RANKS)
 
 rule kraken2:
     input:
@@ -100,7 +100,7 @@ rule metaphlan2_transformer:
     output:
         expand("analyses/{{simname}}/profiles/metaphlan2/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
     run:
-        transformers.metaphlan2_transformer(input, output, ranks=RANKS)
+        transformers.metaphlan2_transformer(str(input), output, ranks=RANKS)
 
 
 rule metaphlan2:
