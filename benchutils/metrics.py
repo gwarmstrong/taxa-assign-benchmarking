@@ -44,6 +44,7 @@ def _load_df(file_, rank, suffix, prefix='', skiprows=0):
     df = df[['PERCENTAGE']]
     percentage_name = get_column_name(prefix, suffix)
     df = df.rename(columns={'PERCENTAGE': percentage_name})
+    print(df.columns)
     return df
 
 
@@ -55,7 +56,8 @@ def load_observed_single_profile(observed_file, rank, suffix, prefix=''):
 def load_observed_profiles(observed_files, rank, methods, prefix=''):
     # merge a bunch of dataframes loaded with `load_observed_single_profile
     dfs = []
-    for observed_file, method in product(observed_files, methods):
+    for observed_file, method in zip(observed_files, methods):
+        assert method in observed_file
         dfs.append(load_observed_single_profile(observed_file,
                                                 rank,
                                                 suffix=method,
@@ -76,6 +78,8 @@ def write_results(results: pd.Series, output_file):
 def profile_error(observed_files, expected_file, output_file, rank,
                   methods, metric):
 
+    print(observed_files)
+
     if rank not in ranks:
         raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
 
@@ -95,8 +99,8 @@ def profile_error(observed_files, expected_file, output_file, rank,
 
     # merges the dataframes to unify the indices in them, fills in missing
     # values with 0, then splits them back apart
-    all_profiles = pd.concat([observed_profiles, expected_profile],
-                             axis=1, sort=False)
+    all_profiles = pd.concat([observed_profiles, expected_profile], 
+                             axis=1, sort=False, join='outer')
     # fill in na's and normalize to 1
     all_profiles = all_profiles.fillna(0) / 100
     observed_profiles = all_profiles.iloc[:, :-1]
@@ -110,8 +114,12 @@ def profile_error(observed_files, expected_file, output_file, rank,
         #               observed_profiles.columns)
         # results = available_metrics[metric](observed_profiles,
         #                                     expected_profile)
-        results = [func(observed_profiles[x], expected_profile) for x in
-                   observed_profiles.columns]
+        # results = [func(observed_profiles[x], expected_profile) for x in
+        #            observed_profiles.columns]
+        print(expected_profile.shape)
+        print(next(observed_profiles.iteritems())[1].shape)
+        results = [func(profile, expected_profile) for _, profile in
+                   observed_profiles.iteritems()]
         results = pd.Series(results, name=metric,
                             index=observed_profiles.columns)
     else:
