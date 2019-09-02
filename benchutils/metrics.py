@@ -20,7 +20,7 @@ def correlation(observed, expected):
                     expected.values.flatten())[0]
 
 
-def l2_loss(observed, expected):
+def l2_norm(observed, expected):
     return norm(observed.values.flatten() - expected.values.flatten(), ord=2)
 
 
@@ -120,6 +120,6 @@ def profile_error(observed_files, expected_file, output_file, rank,
 
 # each should return something like a dataframe
 available_metrics = {'correlation': correlation,
-                     'l2_loss': l2_loss,
+                     'l2_loss': l2_norm,
                      'auprc': auprc,
                      'absolute_error': rmse}
