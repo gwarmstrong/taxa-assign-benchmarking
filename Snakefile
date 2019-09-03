@@ -15,26 +15,26 @@ METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 
 RANKS = config["ranks"]
 
+localrules: all, allplots
 
 rule all:
     input:
-        expand("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.done",
+        expand("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.{metric}.done",
                simname=SIM,
                datetime=DT,
                sample_num=NUM,
-               rank=RANKS)
-    shell:
-        "rm {input}"
+               rank=RANKS,
+               metric=METRICS)
 
 
 rule allplots:
     input:
-        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}plot.ext", metric=METRICS)
+        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.{metric}plot.ext"
     output:
-        "analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.done"
+        temp("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.{metric}.done")
     shell:
         """
-        touch {output}
+        echo '' > {output}
         """
 
 
@@ -44,8 +44,8 @@ rule plotting:
     output:
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}plot.ext", metric=METRICS)
     run:
-        for metric_file in zip(input, output):
-            plotting.correlation_plot(metric_file, input)
+        for metric_file, out_ in zip(input, output):
+            plotting.correlation_plot(metric_file, out_)
 
 
 rule benchmark_metrics:
