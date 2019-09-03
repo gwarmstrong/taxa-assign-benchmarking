@@ -15,6 +15,7 @@ METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 
 RANKS = config["ranks"]
 
+
 rule all:
     input:
         expand("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.done",
@@ -24,6 +25,7 @@ rule all:
                rank=RANKS)
     shell:
         "rm {input}"
+
 
 rule allplots:
     input:
@@ -35,21 +37,6 @@ rule allplots:
         touch {output}
         """
 
-# rule absolute_error_plot:
-#     input:
-#         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt"
-#     output:
-#         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.absolute_errorplot.ext"
-#     run:
-#         plotting.absolute_error_plot(input, output)
-#
-# rule profile_correlation_plot:
-#     input:
-#         "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
-#     output:
-#         "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.correlationplot.ext"
-#     run:
-#         plotting.correlation_plot(input, output)
 
 rule plotting:
     input:
@@ -66,19 +53,11 @@ rule benchmark_metrics:
         true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
         obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
     output:
-        absolute_error = expand("analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.absolute_error.txt", expand=METRICS)
+        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRICS)
     run:
-        for metric in METRICS:
-            metrics.profile_error(input.obs_profiles, input.true_profile, output.absolute_error, wildcards.rank, methods=METHODS, metric=metric)
+        for metric, out_file in zip(METRICS, output):
+            metrics.profile_error(input.obs_profiles, input.true_profile, out_file, wildcards.rank, methods=METHODS, metric=metric)
 
-# rule benchmark_profile_correlation:
-#     input:
-#          true_profile = "data/simulations/{simname}/taxonomic_profile_{sample_num}.txt",
-#          obs_profiles = expand("analyses/{{simname}}/profiles/{method}/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", method=METHODS)
-#     output:
-#           correlation = "analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{rank}.correlation.txt"
-#     run:
-#         metrics.profile_error(obs_profiles, true_profile, output.correlation, wildcards.rank, methods=METHODS, metric='correlation')
 
 # TODO make one rule for running program and transforming output
 rule kraken2_transformer:
@@ -88,6 +67,7 @@ rule kraken2_transformer:
         expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
         transformers.kraken2_transformer(str(input), output, ranks=RANKS)
+
 
 rule kraken2:
     input:
@@ -99,7 +79,7 @@ rule kraken2:
     shell:
         "kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}"
 
-# TODO transformer
+
 rule metaphlan2_transformer:
     input:
         "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
@@ -125,6 +105,7 @@ rule metaphlan2:
         metaphlan2.py {input} --input_type fastq --tax_lev 'a' > {output}        
         """
 
+
 rule shogun:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
@@ -135,6 +116,3 @@ rule shogun:
     shell:
         "touch {output}"
 
-# rule kraken2_transformer
-# rule metaphlan2_transformer
-# rule shogun_transformer

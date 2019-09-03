@@ -114,13 +114,13 @@ def profile_error(observed_files, expected_file, output_file, rank,
         results = pd.Series(results, name=metric,
                             index=observed_profiles.columns)
     else:
-        raise ValueError('Metric \'{}\' is not in available metrics.')
+        raise ValueError('Metric \'{}\' is not in available metrics.'.format(metric))
 
     write_results(results, output_file)
 
 
 # each should return something like a dataframe
 available_metrics = {'correlation': correlation,
-                     'l2_loss': l2_norm,
+                     'l2_norm': l2_norm,
                      'auprc': auprc,
                      'absolute_error': rmse}
