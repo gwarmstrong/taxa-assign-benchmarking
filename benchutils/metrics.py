@@ -35,6 +35,8 @@ def get_column_name(prefix, suffix):
 # TODO goal is to have a unified observed profile so that we can use the
 #  same parser
 def _load_df(file_, rank, suffix, prefix='', skiprows=0):
+    # TODO have a "sniffer" to verify input format and throw error if
+    #  input is incorrect
     df = pd.read_csv(file_, sep='\t', skiprows=skiprows)
     # TODO note that rank is chosen already by kraken
     df = df.loc[df['RANK'] == rank]
