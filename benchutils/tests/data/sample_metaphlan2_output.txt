@@ -1,0 +1,40 @@
+#mpa_v29_CHOCOPhlAn_201901
+#metaphlan2.py data/simulations/out_denovo1/2019.08.07_10.20.59_sample_0/reads/sample_reads.fq --input_type fastq --tax_lev a
+#SampleID	Metaphlan2_Analysis
+#clade_name	NCBI_tax_id	relative_abundance
+k__Bacteria	2	100.0
+k__Bacteria|p__Firmicutes	2|1239	28.89426
+k__Bacteria|p__Thermotogae	2|200918	28.54545
+k__Bacteria|p__Proteobacteria	2|1224	20.6785
+k__Bacteria|p__Deinococcus_Thermus	2|1297	16.45416
+k__Bacteria|p__Actinobacteria	2|201174	5.42762
+k__Bacteria|p__Thermotogae|c__Thermotogae	2|200918|188708	28.54545
+k__Bacteria|p__Firmicutes|c__Bacilli	2|1239|91061	22.69989
+k__Bacteria|p__Proteobacteria|c__Gammaproteobacteria	2|1224|1236	20.6785
+k__Bacteria|p__Deinococcus_Thermus|c__Deinococci	2|1297|188787	16.45416
+k__Bacteria|p__Firmicutes|c__Clostridia	2|1239|186801	6.19438
+k__Bacteria|p__Actinobacteria|c__Actinobacteria	2|201174|1760	5.42762
+k__Bacteria|p__Thermotogae|c__Thermotogae|o__Thermotogales	2|200918|188708|2419	28.54545
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales	2|1239|91061|186826	22.69989
+k__Bacteria|p__Proteobacteria|c__Gammaproteobacteria|o__Enterobacterales	2|1224|1236|91347	20.6785
+k__Bacteria|p__Deinococcus_Thermus|c__Deinococci|o__Thermales	2|1297|188787|68933	16.45416
+k__Bacteria|p__Firmicutes|c__Clostridia|o__Clostridiales	2|1239|186801|186802	6.19438
+k__Bacteria|p__Actinobacteria|c__Actinobacteria|o__Streptosporangiales	2|201174|1760|85012	5.42762
+k__Bacteria|p__Thermotogae|c__Thermotogae|o__Thermotogales|f__Fervidobacteriaceae	2|200918|188708|2419|1643950	28.54545
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales|f__Streptococcaceae	2|1239|91061|186826|1300	22.69989
+k__Bacteria|p__Proteobacteria|c__Gammaproteobacteria|o__Enterobacterales|f__Enterobacteriaceae	2|1224|1236|91347|543	20.6785
+k__Bacteria|p__Deinococcus_Thermus|c__Deinococci|o__Thermales|f__Thermaceae	2|1297|188787|68933|188786	16.45416
+k__Bacteria|p__Firmicutes|c__Clostridia|o__Clostridiales|f__Peptococcaceae	2|1239|186801|186802|186807	6.19438
+k__Bacteria|p__Actinobacteria|c__Actinobacteria|o__Streptosporangiales|f__Nocardiopsaceae	2|201174|1760|85012|83676	5.42762
+k__Bacteria|p__Thermotogae|c__Thermotogae|o__Thermotogales|f__Fervidobacteriaceae|g__Fervidobacterium	2|200918|188708|2419|1643950|2422	28.54545
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales|f__Streptococcaceae|g__Streptococcus	2|1239|91061|186826|1300|1301	22.69989
+k__Bacteria|p__Proteobacteria|c__Gammaproteobacteria|o__Enterobacterales|f__Enterobacteriaceae|g__Salmonella	2|1224|1236|91347|543|590	20.6785
+k__Bacteria|p__Deinococcus_Thermus|c__Deinococci|o__Thermales|f__Thermaceae|g__Meiothermus	2|1297|188787|68933|188786|65551	16.45416
+k__Bacteria|p__Firmicutes|c__Clostridia|o__Clostridiales|f__Peptococcaceae|g__Desulfosporosinus	2|1239|186801|186802|186807|79206	6.19438
+k__Bacteria|p__Actinobacteria|c__Actinobacteria|o__Streptosporangiales|f__Nocardiopsaceae|g__Nocardiopsis	2|201174|1760|85012|83676|2013	5.42762
+k__Bacteria|p__Thermotogae|c__Thermotogae|o__Thermotogales|f__Fervidobacteriaceae|g__Fervidobacterium|s__Fervidobacterium_pennivorans	2|200918|188708|2419|1643950|2422|93466	28.54545
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales|f__Streptococcaceae|g__Streptococcus|s__Streptococcus_pyogenes	2|1239|91061|186826|1300|1301|1314	22.69989
+k__Bacteria|p__Proteobacteria|c__Gammaproteobacteria|o__Enterobacterales|f__Enterobacteriaceae|g__Salmonella|s__Salmonella_bongori	2|1224|1236|91347|543|590|54736	20.6785
+k__Bacteria|p__Deinococcus_Thermus|c__Deinococci|o__Thermales|f__Thermaceae|g__Meiothermus|s__Meiothermus_silvanus	2|1297|188787|68933|188786|65551|52022	16.45416
+k__Bacteria|p__Firmicutes|c__Clostridia|o__Clostridiales|f__Peptococcaceae|g__Desulfosporosinus|s__Desulfosporosinus_meridiei	2|1239|186801|186802|186807|79206|79209	6.19438
+k__Bacteria|p__Actinobacteria|c__Actinobacteria|o__Streptosporangiales|f__Nocardiopsaceae|g__Nocardiopsis|s__Nocardiopsis_dassonvillei	2|201174|1760|85012|83676|2013|2014	5.42762
