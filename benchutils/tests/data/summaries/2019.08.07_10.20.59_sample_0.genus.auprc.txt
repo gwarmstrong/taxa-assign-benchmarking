@@ -1,0 +1,2 @@
+PERCENTAGE_kraken2	0
+PERCENTAGE_metaphlan2	0
