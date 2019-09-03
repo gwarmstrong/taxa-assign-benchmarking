@@ -10,6 +10,9 @@ METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
 METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 
+METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
+METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
+
 # TODO auprc vs. l2 score curve 
 # TODO benchmarks for memory/time
 
@@ -29,7 +32,8 @@ rule all:
 
 rule allplots:
     input:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.{metric}plot.ext"
+        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.{metric}plot.ext",
+        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
     output:
         temp("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.{metric}.done")
     shell:
@@ -37,7 +41,17 @@ rule allplots:
         echo '' > {output}
         """
 
+rule metric_comparison_plotting:
+    input:
+        file1 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS1),
+        file2 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS2),
+    output:
+        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
+    rule:
+        for file1, file2, out_file in zip(input.file1, input.file2, output):
+            plotting.metric_comparison_plot(file1, file2, out_file)
 
+# TODO define rules for metric_comparison plotting and method_comparison plotting
 rule plotting:
     input:
         expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRICS)
