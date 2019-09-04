@@ -13,24 +13,35 @@ METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
 METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
 
-# TODO auprc vs. l2 score curve 
 # TODO benchmarks for memory/time
 
 RANKS = config["ranks"]
 
-localrules: all, allplots
+localrules: all, all_plots, all_metric_plots
+
 
 rule all:
     input:
-        expand("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.{metric}.done",
+        expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done",
                simname=SIM,
                datetime=DT,
-               sample_num=NUM,
                rank=RANKS,
                metric=METRICS)
 
 
-rule allplots:
+rule all_plots:
+    input:
+        expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=NUM),
+        expand("analyses/{{simname}}/plots/{{datetime}}_sample_all.{{rank}}.{metric}.svg", metric=METRICS)
+    output:
+        temp("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done")
+    shell:
+        """
+        echo '' > {output}
+        """
+
+
+rule all_metric_plots:
     input:
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
     output:
