@@ -17,13 +17,18 @@ def _load_summary_series(df_loc):
 
 
 def metrics_scatterplot(metrics_df, x_offset=None, scatterplot_kwargs=None):
-    """
+    """makes a scatterplot of the first column in `metrics_df` by the
+    second column in `metrics_df`
 
     Parameters
     ----------
-    metrics_df
-    x_offset
-    scatterplot_kwargs
+    metrics_df : pd.DataFrame
+        DataFrame containing numerical measurments in the first two columns
+    x_offset : float
+        amount to offset scatterplot point labels by
+    scatterplot_kwargs : dict
+        kwargs to be passed to sns.scatterplot
+
 
     Returns
     -------
@@ -64,6 +69,7 @@ def methods_swarmplot(measurements, swarmplot_kwargs=None):
         a DataFrame containing two columns, the first being title 'method',
         and the second containing floats
     swarmplot_kwargs
+        kwargs to be passed to sns.swarmplot
 
     Returns
     -------
