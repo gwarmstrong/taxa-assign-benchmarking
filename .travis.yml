@@ -33,5 +33,5 @@ script:
   # lint
   - flake8 benchutils/ setup.py
 
-# after_success:
-#   - coveralls
+after_success:
+  - coveralls
