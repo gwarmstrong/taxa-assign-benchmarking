@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -11,7 +10,8 @@ def _method_stripper(x): return '_'.join(x.split('_')[1:])
 
 
 def load_summary_series(df_loc):
-    df = pd.read_csv(df_loc, sep='\t', names=['method', _metric_getter(df_loc)])
+    df = pd.read_csv(df_loc, sep='\t',
+                     names=['method', _metric_getter(df_loc)])
     df['method'] = df['method'].map(_method_stripper)
     return df
 
