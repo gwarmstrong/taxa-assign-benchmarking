@@ -46,7 +46,7 @@ rule metric_comparison_plotting:
         file2 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS2)
     output:
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
-    rule:
+    run:
         for file1, file2, out_file in zip(input.file1, input.file2, output):
             plotting.metric_comparison_plot(file1, file2, out_file)
 
@@ -55,18 +55,8 @@ rule method_comparison_plotting:
         expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=NUM)
     output:
         "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg"
-    rule:
-        plotting.method_comparison_plot(input, output)
-
-# TODO define rules for metric_comparison plotting and method_comparison plotting
-rule plotting:
-    input:
-        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRICS)
-    output:
-        expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}plot.ext", metric=METRICS)
     run:
-        for metric_file, out_ in zip(input, output):
-            plotting.correlation_plot(metric_file, out_)
+        plotting.method_comparison_plot(input, output)
 
 
 rule benchmark_metrics:
