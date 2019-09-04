@@ -1,0 +1,7 @@
+pandas
+matplotlib
+seaborn
+numpy>=1.17.1
+scikit-learn
+scipy
+snakemake

@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from benchutils import ranks
 import numpy as np
@@ -106,7 +105,7 @@ def profile_error(observed_files, expected_file, output_file, rank,
 
     # merges the dataframes to unify the indices in them, fills in missing
     # values with 0, then splits them back apart
-    all_profiles = pd.concat([observed_profiles, expected_profile], 
+    all_profiles = pd.concat([observed_profiles, expected_profile],
                              axis=1, sort=False, join='outer')
     # fill in na's and normalize to 1
     all_profiles = all_profiles.fillna(0) / 100
@@ -122,7 +121,8 @@ def profile_error(observed_files, expected_file, output_file, rank,
         results = pd.Series(results, name=metric,
                             index=observed_profiles.columns)
     else:
-        raise ValueError('Metric \'{}\' is not in available metrics.'.format(metric))
+        raise ValueError('Metric \'{}\' is not in available metrics.'.format(
+            metric))
 
     write_results(results, output_file)
 

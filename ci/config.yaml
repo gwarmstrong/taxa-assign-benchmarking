@@ -1,0 +1,5 @@
+kraken_db:
+    "/path/to/db"
+ranks:
+    # if not in a list, it will mess up
+    ["genus", "species"]

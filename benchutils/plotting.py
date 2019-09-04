@@ -108,4 +108,3 @@ def method_comparison_plot(list_of_files, output_file,
                                    scatterplot_kwargs=scatterplot_kwargs)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
     fig.savefig(output_file, bbox_inches='tight')
-

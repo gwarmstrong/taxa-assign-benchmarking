@@ -22,6 +22,7 @@ localrules: all, all_plots, all_metric_plots, unzip
 
 
 rule all:
+    # TODO input can understand if/else, could be useful for only including some parts of pipeline
     input:
         expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done",
                simname=SIM,
