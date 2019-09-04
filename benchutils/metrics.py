@@ -4,6 +4,7 @@ from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
 from scipy.stats import pearsonr
+from sklearn.metrics import auc, precision_recall_curve
 
 
 def rmse(observed, expected):
@@ -24,8 +25,13 @@ def l2_norm(observed, expected):
 
 
 def auprc(observed, expected):
-    # TODO make actual function for calculating
-    return 0
+    # TODO failing unit test... I think due to trapezoidal rule in auc
+    observed = observed.values.flatten()
+    expected = (expected.values.flatten() > 0).astype(float)
+
+    precision, recall, _ = precision_recall_curve(expected, observed)
+    auprc_ = auc(recall, precision)
+    return auprc_
 
 
 def get_column_name(prefix, suffix):
