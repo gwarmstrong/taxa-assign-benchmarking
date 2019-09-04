@@ -27,7 +27,7 @@ script:
   - echo '' > data/simulations/test-sim/taxonomic_profile_0.txt
   - echo '' > data/simulations/test-sim/taxonomic_profile_1.txt
   # snakemake dry run
-  - snakemake -n -r --config-file ci/config.yaml
+  - snakemake -n -r --configfile ci/config.yaml
   # unit tests
   - nosetests -v benchutils --with-coverage --cover-package=benchutils
   # lint
