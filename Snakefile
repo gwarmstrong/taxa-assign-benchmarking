@@ -1,10 +1,11 @@
 from benchutils import metrics, plotting, transformers
 
-# filename = "anonymous_reads.fq"
-# (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq")
-#
 filename = "anonymous_reads"
-(SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
+(SIM, DT, NUM, _) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
+
+SIM = sorted(set(SIM))
+DT = sorted(set(DT))
+NUM = sorted(set(NUM))
 
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
