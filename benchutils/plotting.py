@@ -9,65 +9,103 @@ def _metric_getter(x): return x.split('.')[-2]
 def _method_stripper(x): return '_'.join(x.split('_')[1:])
 
 
-def load_summary_series(df_loc):
+def _load_summary_series(df_loc):
     df = pd.read_csv(df_loc, sep='\t',
                      names=['method', _metric_getter(df_loc)])
     df['method'] = df['method'].map(_method_stripper)
     return df
 
 
-def metrics_scatterplot(df, x_offset=None, scatterplot_kwargs=None):
-    # TODO docs
+def metrics_scatterplot(metrics_df, x_offset=None, scatterplot_kwargs=None):
+    """
+
+    Parameters
+    ----------
+    metrics_df
+    x_offset
+    scatterplot_kwargs
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        figure containing the scatterplot
+    matplotlib.axes.Axes
+        the axes of the scatterplot
+
+    """
+    # TODO maybe refactor to take two series/arrays (sklearn-like)
     if scatterplot_kwargs is None:
         scatterplot_kwargs = dict()
     fig, ax = plt.subplots(figsize=(4, 4))
-    x_name = df.columns[0]
-    y_name = df.columns[1]
-    sns.scatterplot(data=df, x=x_name, y=y_name, ax=ax, **scatterplot_kwargs)
+    x_name = metrics_df.columns[0]
+    y_name = metrics_df.columns[1]
+    sns.scatterplot(data=metrics_df, x=x_name, y=y_name, ax=ax,
+                    **scatterplot_kwargs)
     x_min, x_max = ax.get_xlim()
     if x_offset is None:
         # TODO should be some other sanity check here
         x_offset = (x_max - x_min) / 50
-    for index, row in df.T.iteritems():
+    for index, row in metrics_df.T.iteritems():
         ax.text(row[x_name] + x_offset, row[y_name], index)
     return fig, ax
 
 
-def methods_scatterplot(measurements, scatterplot_kwargs=None):
-    # TODO docs
-    if scatterplot_kwargs is None:
-        scatterplot_kwargs = dict()
+def methods_swarmplot(measurements, swarmplot_kwargs=None):
+    # TODO can probably refactor the columns to be a little more general,
+    #  e.g., sns.swarmplot(x=method_column, y=measurements_column, ...),
+    #  where these variables are passed in
+    """Makes a swarmplot of the values in the second column of
+    `measurements` by the value in their `method` column (presumably the
+    first column).
+
+    Parameters
+    ----------
+    measurements : pd.DataFrame
+        a DataFrame containing two columns, the first being title 'method',
+        and the second containing floats
+    swarmplot_kwargs
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        figure containing the swarmplot
+    matplotlib.axes.Axes
+        the axes of the swarmplot
+
+    """
+    if swarmplot_kwargs is None:
+        swarmplot_kwargs = dict()
     fig, ax = plt.subplots(figsize=(4, 4))
     y_name = measurements.columns[1]
     sns.swarmplot(x='method', y=y_name, data=measurements, ax=ax,
-                  **scatterplot_kwargs)
+                  **swarmplot_kwargs)
 
     return fig, ax
 
 
 def metric_comparison_plot(metric1_file, metric2_file, output_file,
                            scatterplot_kwargs=None):
-    # TODO finish docs
     """Makes a scatterplot for each tuple in zip(files_metric1,
     files_metric2) that have the same entries in each. First metric is
     x-axis and second metric is y-axis.
 
     Parameters
     ----------
-    metric1_file
-    metric2_file
-    output_file
-    scatterplot_kwargs
-
-    Returns
-    -------
+    metric1_file : str
+        filepath to the series to be used for the x-axis of the scatterplot
+    metric2_file : str
+        filepath to the series to be used for the y-axis of the scatterplot
+    output_file : str
+        name of the output file
+    scatterplot_kwargs : dict
+        kwargs to be passed to sns.scatterplot
 
     """
-    # TODO WARN and drop if there is something in one file not in the other
+    # TODO WARN and drop if there is an index in one file not in the other
     if scatterplot_kwargs is None:
         scatterplot_kwargs = dict()
-    df1 = load_summary_series(metric1_file)
-    df2 = load_summary_series(metric2_file)
+    df1 = _load_summary_series(metric1_file)
+    df2 = _load_summary_series(metric2_file)
     df1.set_index('method', inplace=True)
     df2.set_index('method', inplace=True)
     df = pd.concat([df1, df2], axis=1)
@@ -76,31 +114,31 @@ def metric_comparison_plot(metric1_file, metric2_file, output_file,
 
 
 def method_comparison_plot(list_of_files, output_file,
-                           scatterplot_kwargs=None):
-    # TODO finish docs
+                           swarmplot_kwargs=None):
     """Makes a swarmplot, where each row in a file adds an entry to
     a corresponding box/category in the plot.
 
     Parameters
     ----------
-    list_of_files
-    output_file
-    scatterplot_kwargs
-
-    Returns
-    -------
+    list_of_files : list of str
+        list of paths to all files that should be concatenated for the
+        swarmplot
+    output_file : str
+        name of the output file
+    swarmplot_kwargs : dict
+        kwargs to be passed to sns.swarmplot
 
     """
-    if scatterplot_kwargs is None:
-        scatterplot_kwargs = dict()
+    if swarmplot_kwargs is None:
+        swarmplot_kwargs = dict()
     # TODO sanity check files
     # LOAD list_of_files
-    dfs = [load_summary_series(df_) for df_ in list_of_files]
+    dfs = [_load_summary_series(df_) for df_ in list_of_files]
 
     # make plot containing all df's concatenated together
     measurements = pd.concat(dfs)
-    fig, ax = methods_scatterplot(measurements,
-                                  scatterplot_kwargs=scatterplot_kwargs)
+    fig, ax = methods_swarmplot(measurements,
+                                swarmplot_kwargs=swarmplot_kwargs)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
 
     # write out plot (as svg)
