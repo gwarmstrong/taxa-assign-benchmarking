@@ -3,8 +3,8 @@ from benchutils import metrics, plotting, transformers
 # filename = "anonymous_reads.fq"
 # (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq")
 #
-filename = "medium_anon_reads.fq"
-(SIM, DT, NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename)
+filename = "anonymous_reads"
+(SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
@@ -17,7 +17,7 @@ METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
 
 RANKS = config["ranks"]
 
-localrules: all, all_plots, all_metric_plots
+localrules: all, all_plots, all_metric_plots, unzip
 
 
 rule all:
@@ -93,7 +93,7 @@ rule kraken2_transformer:
 
 rule kraken2:
     input:
-        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
         all = "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt",
     conda:
@@ -113,7 +113,7 @@ rule metaphlan2_transformer:
 
 rule metaphlan2:
     input:
-        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
         "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
     resources:
@@ -130,11 +130,20 @@ rule metaphlan2:
 
 rule shogun:
     input:
-        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
         expand("analyses/{{simname}}/profiles/shogun/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
     conda:
         "envs/taxa-benchmark.yml"
     shell:
         "touch {output}"
+
+
+rule unzip:
+    input:
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq.gz"
+    output:
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
+    shell:
+        "gunzip {input}"
 
