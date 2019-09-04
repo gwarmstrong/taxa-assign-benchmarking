@@ -21,11 +21,10 @@ def method_stripper(x): return '_'.join(x.split('_')[1:])
 def _load_summary_series(df_loc):
     df = pd.read_csv(df_loc, sep='\t', names=['method', metric_getter(df_loc)])
     df['method'] = df['method'].map(method_stripper)
-    df.set_index('method', inplace=True)
     return df
 
 
-def metrics_scatterplot(df, x_offset=None, scatterplot_kwargs=None):
+def _metrics_scatterplot(df, x_offset=None, scatterplot_kwargs=None):
     if scatterplot_kwargs is None:
         scatterplot_kwargs = dict()
     fig, ax = plt.subplots(figsize=(4, 4))
@@ -41,8 +40,19 @@ def metrics_scatterplot(df, x_offset=None, scatterplot_kwargs=None):
     return fig, ax
 
 
-def metric_comparison_plot(metric1_file, metric2_file, output_file, *args,
-                           **kwargs):
+def _methods_scatterplot(measurements, scatterplot_kwargs=None):
+    if scatterplot_kwargs is None:
+        scatterplot_kwargs = dict()
+    fig, ax = plt.subplots(figsize=(4, 4))
+    y_name = measurements.columns[1]
+    sns.swarmplot(x='method', y=y_name, data=measurements, ax=ax,
+                  **scatterplot_kwargs)
+
+    return fig, ax
+
+
+def metric_comparison_plot(metric1_file, metric2_file, output_file,
+                           scatterplot_kwargs=None):
     """Makes a scatterplot for each tuple in zip(files_metric1,
     files_metric2) that have the same entries in each. First metric is
     x-axis and second metric is y-axis.
@@ -51,28 +61,35 @@ def metric_comparison_plot(metric1_file, metric2_file, output_file, *args,
     ----------
     metric1_file
     metric2_file
-    output_files
+    output_file
+    scatterplot_kwargs
 
     Returns
     -------
 
     """
     # TODO WARN and drop if there is something in one file not in the other
+    if scatterplot_kwargs is None:
+        scatterplot_kwargs = dict()
     df1 = _load_summary_series(metric1_file)
     df2 = _load_summary_series(metric2_file)
+    df1.set_index('method', inplace=True)
+    df2.set_index('method', inplace=True)
     df = pd.concat([df1, df2], axis=1)
-    fig, _ = metrics_scatterplot(df)
+    fig, _ = _metrics_scatterplot(df, scatterplot_kwargs=scatterplot_kwargs)
     fig.savefig(output_file, bbox_inches='tight')
 
 
-def method_comparision_plot(list_of_files, output_file, *args, **kwargs):
-    """Makes a boxplot/swarmplot, where each row in a file adds an entry to
+def method_comparison_plot(list_of_files, output_file,
+                           scatterplot_kwargs=None):
+    """Makes a swarmplot, where each row in a file adds an entry to
     a corresponding box/category in the plot.
 
     Parameters
     ----------
     list_of_files
     output_file
+    scatterplot_kwargs
 
     Returns
     -------
@@ -83,5 +100,12 @@ def method_comparision_plot(list_of_files, output_file, *args, **kwargs):
     # TODO make plot containing all df's, separated by category (each series
     #  loaded should really be a row
     # TODO write out plot (as svg?)
-    pass
+    if scatterplot_kwargs is None:
+        scatterplot_kwargs = dict()
+    dfs = [_load_summary_series(df_) for df_ in list_of_files]
+    measurements = pd.concat(dfs)
+    fig, ax = _methods_scatterplot(measurements,
+                                   scatterplot_kwargs=scatterplot_kwargs)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+    fig.savefig(output_file, bbox_inches='tight')
 

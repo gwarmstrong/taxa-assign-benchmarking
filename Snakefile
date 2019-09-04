@@ -4,7 +4,7 @@ from benchutils import metrics, plotting, transformers
 # (SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/anonymous_reads.fq")
 #
 filename = "medium_anon_reads.fq"
-(SIM,DT,NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename)
+(SIM, DT, NUM) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename)
 
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
@@ -32,7 +32,6 @@ rule all:
 
 rule allplots:
     input:
-        "analyses/{simname}/plots/{datetime}_sample_{sample_num}.{rank}.{metric}plot.ext",
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
     output:
         temp("analyses/{simname}/{datetime}_sample_{sample_num}.{rank}.{metric}.done")
@@ -44,12 +43,20 @@ rule allplots:
 rule metric_comparison_plotting:
     input:
         file1 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS1),
-        file2 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS2),
+        file2 = expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric}.txt", metric=METRIC_COMPARISONS2)
     output:
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_{{sample_num}}.{{rank}}.{metric1}_vs_{metric2}.svg", zip, metric1=METRIC_COMPARISONS1, metric2=METRIC_COMPARISONS2)
     rule:
         for file1, file2, out_file in zip(input.file1, input.file2, output):
             plotting.metric_comparison_plot(file1, file2, out_file)
+
+rule method_comparison_plotting:
+    input:
+        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=NUM)
+    output:
+        "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg"
+    rule:
+        plotting.method_comparison_plot(input, output)
 
 # TODO define rules for metric_comparison plotting and method_comparison plotting
 rule plotting:

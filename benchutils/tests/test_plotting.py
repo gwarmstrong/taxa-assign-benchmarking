@@ -4,7 +4,9 @@ from benchutils import plotting
 
 
 class TestMetricComparisonPlot(unittest.TestCase):
-    # TODO get filepaths for demo data and run it on them
+    # TODO get test filepaths with some more sophisticated way for demo data
+    #  and run it on them, and keep track of files to delete after running
+    #  unit tests
     def test_metric_comparison_plot_runs(self):
         plotting.metric_comparison_plot('benchutils/tests/data/summaries/'
                                         '2019.08.07_10.20.59_sample_0.genus'
@@ -13,7 +15,19 @@ class TestMetricComparisonPlot(unittest.TestCase):
                                         '2019.08.07_10.20.59_sample_0.genus'
                                         '.correlation.txt',
                                         'benchutils/tests/data/summaries/'
-                                        'test_plot.svg')
+                                        'test_metric_plot.svg')
+
+
+class TestMethodComparisonPlot(unittest.TestCase):
+    def test_method_comparison_plot_runs(self):
+        plotting.method_comparison_plot(['benchutils/tests/data/summaries/'
+                                         '2019.08.07_10.20.59_sample_0.genus'
+                                         '.correlation.txt',
+                                         'benchutils/tests/data/summaries/'
+                                         '2019.08.07_10.20.59_sample_1.genus'
+                                         '.correlation.txt'],
+                                        'benchutils/tests/data/summaries/'
+                                        'test_method_plot.svg')
 
 
 class TestHelperFunctions(unittest.TestCase):
