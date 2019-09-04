@@ -67,7 +67,7 @@ rule method_comparison_plotting:
     output:
         "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg"
     run:
-        plotting.method_comparison_plot(input, output)
+        plotting.method_comparison_plot(input, str(output))
 
 
 rule benchmark_metrics:
