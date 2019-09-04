@@ -2,7 +2,10 @@ import unittest
 
 
 class TestMetaphlan2Transformer(unittest.TestCase):
-    # TODO figure out how to get absolute paths to test data directory and
+    # TODO (blocking unittests in test_metrics) figure out how to get absolute
+    #  paths
+    #  to test data
+    #  directory and
     #  delete files after done running unit tests
     pass
 

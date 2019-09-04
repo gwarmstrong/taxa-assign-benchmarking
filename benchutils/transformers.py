@@ -6,9 +6,7 @@ kraken_rank_dictionary = {
     'O': 'order',
     'F': 'family',
     'G': 'genus',
-    'S': 'species'  # TODO convert to strain to species using ETE toolkit (it
-    # gets kind of tricky because kraken gives pretty high res species
-    # estimates
+    'S': 'species'
 }
 
 greengenes_rank_dict = {
@@ -25,7 +23,6 @@ kraken_columns = ['PERCENTAGE', 'lca_read_count', 'read_count', 'rank',
                   '@@TAXID', 'TAXNAME']
 
 
-#  Order: o__, Family: f__, Genus: g__, Species: s__]
 def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
     # TODO finsih docs
     """Converts a summary of all ranks from kraken into rank-wise profiles
