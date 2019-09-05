@@ -1,5 +1,6 @@
 from benchutils import metrics, plotting, transformers
 
+# TODO move to config
 filename = "anonymous_reads"
 (SIM, DT, NUM, _) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
@@ -7,16 +8,20 @@ SIM = sorted(set(SIM))
 DT = sorted(set(DT))
 NUM = sorted(set(NUM))
 
+# TODO move to config
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
+# TODO move to config
 METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 
+# TODO move to config
 METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
+# TODO move to config
 METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
 
-# TODO benchmarks for memory/time
-
 RANKS = config["ranks"]
+
+# TODO benchmarks for memory/time on rules (particularly assignment methods)
 
 localrules: all, all_plots, all_metric_plots, unzip
 
@@ -83,7 +88,6 @@ rule benchmark_metrics:
             metrics.profile_error(input.obs_profiles, input.true_profile, out_file, wildcards.rank, methods=METHODS, metric=metric)
 
 
-# TODO make one rule for running program and transforming output
 rule kraken2_transformer:
     input:
         "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
@@ -131,6 +135,7 @@ rule metaphlan2:
 
 
 rule shogun:
+    # TODO finish rule
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
