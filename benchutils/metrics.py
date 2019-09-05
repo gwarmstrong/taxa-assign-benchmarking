@@ -7,29 +7,81 @@ from sklearn.metrics import auc, precision_recall_curve
 
 
 def rmse(observed, expected):
-    # TODO docs
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The root mean squared error between the series
+
+    """
     # see https://stackoverflow.com/questions/21926020/how-to-calculate-rmse
     #  -using-ipython-numpy
-    predictions = observed.values.flatten()
-    targets = expected.values.flatten()
-    return np.sqrt(np.mean((predictions - targets) ** 2))
+    return np.sqrt(np.mean((observed - expected) ** 2))
 
 
 def correlation(observed, expected):
-    # TODO docs
-    return pearsonr(observed.values.flatten(),
-                    expected.values.flatten())[0]
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The Pearson correlation between the series
+
+    """
+    return pearsonr(observed, expected)[0]
 
 
 def l2_norm(observed, expected):
-    # TODO docs
-    return norm(observed.values.flatten() - expected.values.flatten(), ord=2)
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The l2_norm between the series
+
+    """
+    return norm(observed - expected, ord=2)
 
 
 def auprc(observed, expected):
-    # TODO docs
-    observed = observed.values.flatten()
-    expected = (expected.values.flatten() > 0).astype(float)
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The AUPRC with expected > 0 positvie, and negative otherwise
+
+    """
+    expected = (expected > 0).astype(float)
 
     precision, recall, _ = precision_recall_curve(expected, observed)
     auprc_ = auc(recall, precision)
@@ -84,7 +136,32 @@ def _load_expected_profile(expected_file, rank, prefix=''):
 # TODO unit test
 def profile_error(observed_files, expected_file, output_file, rank,
                   methods, metric):
-    # TODO docs
+    """
+
+    Parameters
+    ----------
+    observed_files : list of str or str
+        A filepath to a profile returned by a method, or list of
+        filepaths to profiles returned from a method
+    expected_file : str
+        A filepath to the ground truth profile
+    output_file : str
+        A filepath to write the results of the error profiling to
+    rank : str
+        A taxonomic rank to evaluate the error at
+    methods : list of str or str
+        Has the same shape as `observed_files` and details the method used
+        in the corresponding observed file.
+    metric : str
+        A metric to use to evaluate the observed profiles
+
+    Raises
+    ------
+    ValueError
+        If `rank` is not an available/valid rank
+        If `metric` is not an available/valid metric
+
+    """
 
     if rank not in ranks:
         raise ValueError('Rank \'{}\' not in available ranks'.format(rank))
@@ -115,11 +192,12 @@ def profile_error(observed_files, expected_file, output_file, rank,
     all_profiles = all_profiles.fillna(0) / 100
     observed_profiles = all_profiles.iloc[:, :-1]
     expected_profile = all_profiles.iloc[:, [-1]]
+    # expected_profile = expected_profile.values.flatten()
     # TODO maybe take difference from sum to 100 as unassigned
 
     func = available_metrics[metric]
-    results = [func(profile, expected_profile) for _, profile in
-               observed_profiles.iteritems()]
+    results = [func(profile, expected_profile)
+               for _, profile in observed_profiles.iteritems()]
     results = pd.Series(results, name=metric,
                         index=observed_profiles.columns)
 

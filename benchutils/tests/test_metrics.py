@@ -1,7 +1,8 @@
 import unittest
 import pandas as pd
+import numpy as np
 
-from benchutils.metrics import l2_norm, auprc
+from benchutils.metrics import l2_norm, auprc, correlation, rmse
 
 
 class TestMetrics(unittest.TestCase):
@@ -16,7 +17,18 @@ class TestMetrics(unittest.TestCase):
         self.assertAlmostEqual(observed_auprc, expected_auprc)
 
     def test_correlation_basic(self):
-        pass
+        exp_profile = pd.Series([0.5, 0.4, 0.1, 0])
+        obs_profile = pd.Series([0.4, 0.3, 0.05, 0.25])
+
+        numerator = ((exp_profile - exp_profile.mean()) *
+                     (obs_profile - obs_profile.mean())).sum()
+        denominator_sq = ((exp_profile - exp_profile.mean()) ** 2).sum() * \
+                         ((obs_profile - obs_profile.mean()) ** 2).sum()
+
+        denominator = np.sqrt(denominator_sq)
+        expected_correlation = numerator / denominator
+        observed_correlation = correlation(obs_profile, exp_profile)
+        self.assertAlmostEqual(observed_correlation, expected_correlation)
 
     def test_l2_norm_basic(self):
         input_ = pd.Series([1, 0])
@@ -26,9 +38,14 @@ class TestMetrics(unittest.TestCase):
         self.assertAlmostEqual(observed, expected)
 
     def test_rmse_basic(self):
-        pass
+        input_ = pd.Series([1, 0])
+        output = pd.Series([0, 0])
+        expected = np.sqrt(1 / 2)
+        observed = rmse(input_, output)
+        self.assertAlmostEqual(observed, expected)
 
 
+# TODO test these (blocked by unittest filesystem)
 class TestProfileError(unittest.TestCase):
 
     def test_errors_metric_not_in_available_metrics(self):
