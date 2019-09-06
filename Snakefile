@@ -150,9 +150,9 @@ rule metaphlan2:
 
 rule mohawk_transformer:
     input:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     output:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}.genus.profile.txt"
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus.profile.txt"
     run:
         transformers.mohawk_transformer(str(input), str(output))
 
