@@ -106,7 +106,6 @@ def _load_df(file_, rank, suffix, prefix='', skiprows=0):
     df = df[['PERCENTAGE']]
     percentage_name = _get_column_name(prefix, suffix)
     df = df.rename(columns={'PERCENTAGE': percentage_name})
-    print(df.columns)
     return df
 
 
