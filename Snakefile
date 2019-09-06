@@ -7,17 +7,10 @@ filename = "anonymous_reads"
 
 # this sorting does not account for different DT's and sample_nums for different simulations...
 
-# TODO move to config
-METHODS = ["kraken2", "metaphlan2"] # "shogun"]
-
-# TODO move to config
-METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
-
-# TODO move to config
-METRIC_COMPARISONS1 = ['l2_norm', 'l2_norm']
-# TODO move to config
-METRIC_COMPARISONS2 = ['absolute_error', 'auprc']
-
+METHODS = config["methods"]
+METRICS = config["metrics"]
+METRIC_COMPARISONS1 = config["metric_comparisons1"]
+METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
