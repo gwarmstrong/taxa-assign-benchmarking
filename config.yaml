@@ -1,0 +1,6 @@
+kraken_db:
+    #"/panfs/panfs1.ucsd.edu/panscratch/garmstro/kraken_db/kraken-standard"
+    "/projects/genome_annotation/ref107/dbs/kraken2"
+ranks:
+    # if not in a list, it will mess up
+    ["family", "genus", "species"]

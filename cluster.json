@@ -1,0 +1,12 @@
+{
+    "__default__":
+    {
+        "mem_gb": 10,
+        "time": 1:00:00
+    },
+    "metaphlan2":
+    {
+        "mem_gb": 64,
+        "time": 6:00:00
+    }
+}
