@@ -1,8 +1,9 @@
 from benchutils import metrics, plotting, transformers
+from itertools import product
 
 # TODO move to config
 filename = "anonymous_reads"
-(SIM, DT, NUM, _) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
+(SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
 # this sorting does not account for different DT's and sample_nums for different simulations...
 
@@ -20,6 +21,13 @@ METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
 RANKS = config["ranks"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
+#
+
+# TODO this is not the most efficient way...
+SIM, DT = [[filtered_list[i] for filtered_list in filter(lambda x: x[2] in {'fq', 'fq.gz'}, zip(SIM, DT, EXT))] for i in range(2)]
+
+# TODO this is not the most efficient way...
+EXP_RANK, EXP_MET = [[prod[i] for prod in product(RANKS, METRICS)] for i in range(2)]
 
 localrules: all, all_plots, all_metric_plots, unzip
 
@@ -28,10 +36,10 @@ rule all:
     # TODO input can understand if/else, could be useful for only including some parts of pipeline
     input:
         expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done", zip,
-               simname=SIM * len(METRICS),
-               datetime=DT * len(METRICS),
-               rank=RANKS * len(METRICS),
-               metric=METRICS * len(SIM))
+               simname=SIM * len(METRICS) * len(RANKS),
+               datetime=DT * len(METRICS) * len(RANKS),
+               rank=EXP_RANK * len(SIM),
+               metric=EXP_MET * len(SIM))
 
 
 rule all_plots:
