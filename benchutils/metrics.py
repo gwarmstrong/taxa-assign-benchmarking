@@ -11,9 +11,9 @@ def rmse(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -32,9 +32,9 @@ def correlation(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -43,6 +43,8 @@ def correlation(observed, expected):
         The Pearson correlation between the series
 
     """
+    observed = np.array(observed)
+    expected = np.array(expected)
     return pearsonr(observed, expected)[0]
 
 
@@ -51,9 +53,9 @@ def l2_norm(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -70,9 +72,9 @@ def auprc(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -196,7 +198,8 @@ def profile_error(observed_files, expected_file, output_file, rank,
     # TODO maybe take difference from sum to 100 as unassigned
 
     func = available_metrics[metric]
-    results = [func(profile, expected_profile)
+    results = [func(profile.values.flatten(),
+                    expected_profile.values.flatten())
                for _, profile in observed_profiles.iteritems()]
     results = pd.Series(results, name=metric,
                         index=observed_profiles.columns)
