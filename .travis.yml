@@ -20,7 +20,6 @@ install:
 script:
   - source activate test-env
   # setup dummy test data
-  # TODO put in a script and make a second simulation
   - chmod +x ci/setup_demo_data.sh
   - ci/setup_demo_data.sh
   # snakemake dry run
