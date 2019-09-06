@@ -139,8 +139,6 @@ rule metaphlan2:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
         "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
-    resources:
-        mem_gb=64
     conda:
         "envs/taxa-benchmark.yml"
     shell:
@@ -150,6 +148,30 @@ rule metaphlan2:
         metaphlan2.py {input} --input_type fastq --tax_lev 'a' > {output}        
         """
 
+rule mohawk_transformer:
+    input:
+        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+    output:
+        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}.genus.profile.txt"
+    run:
+        transformers.mohawk_transformer(str(input), str(output))
+
+rule mohawk:
+    input:
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
+    output:
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+    conda:
+        "envs/mohawk.yml"
+    shell:
+        """
+        mohawk classify \
+            --model /home/garmstro/gwarmstrong-repos/mohawk/runs/Sep05_16-33-46_brncl-34.ucsd.edu/models/trained_model_epoch_25_seed_1234.mod \
+            --sequence-file {input} \
+            --length 150 \
+            --batch-size 640 \
+            --output-file {output}
+        """
 
 rule shogun:
     # TODO finish rule
