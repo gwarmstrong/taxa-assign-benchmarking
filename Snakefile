@@ -4,9 +4,7 @@ from benchutils import metrics, plotting, transformers
 filename = "anonymous_reads"
 (SIM, DT, NUM, _) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
-SIM = sorted(set(SIM))
-DT = sorted(set(DT))
-NUM = sorted(set(NUM))
+# this sorting does not account for different DT's and sample_nums for different simulations...
 
 # TODO move to config
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
@@ -29,16 +27,16 @@ localrules: all, all_plots, all_metric_plots, unzip
 rule all:
     # TODO input can understand if/else, could be useful for only including some parts of pipeline
     input:
-        expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done",
-               simname=SIM,
-               datetime=DT,
-               rank=RANKS,
-               metric=METRICS)
+        expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done", zip,
+               simname=SIM * len(METRICS),
+               datetime=DT * len(METRICS),
+               rank=RANKS * len(METRICS),
+               metric=METRICS * len(SIM))
 
 
 rule all_plots:
     input:
-        expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=NUM),
+        expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=sorted(set(NUM))),
         expand("analyses/{{simname}}/plots/{{datetime}}_sample_all.{{rank}}.{metric}.svg", metric=METRICS)
     output:
         temp("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done")
@@ -139,11 +137,11 @@ rule shogun:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
-        expand("analyses/{{simname}}/profiles/shogun/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+        expand("analyses/{{simname}}/profiles/shogun/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "touch {output}"
+        "echo '' > {output}"
 
 
 rule unzip:

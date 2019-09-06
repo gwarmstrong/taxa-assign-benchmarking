@@ -20,7 +20,7 @@ install:
 script:
   - source activate test-env
   # setup dummy test data
-  # TODO maybe put in a script and make a second simulation
+  # TODO put in a script and make a second simulation
   - mkdir -p data/simulations/test-sim/fake_date_sample_{0,1}/reads/
   - echo '' > data/simulations/test-sim/fake_date_sample_0/reads/anonymous_reads.fq.gz
   - echo '' > data/simulations/test-sim/fake_date_sample_1/reads/anonymous_reads.fq
