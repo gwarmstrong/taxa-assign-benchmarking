@@ -1,8 +1,5 @@
 language: python
 
-env:
-  - PYVERSION=3.6
-
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
@@ -12,7 +9,8 @@ before_install:
   - conda info -a
 
 install:
-  - conda create --yes --file envs/snakemake.yml -n test-env python=$PYVERSION
+  # python version = 3.6 via envs/snakemake.yml
+  - conda env create --file envs/snakemake.yml -n test-env
   - conda install -n test-env --yes flake8 nose coveralls
   - source activate test-env
   - pip install -e .
