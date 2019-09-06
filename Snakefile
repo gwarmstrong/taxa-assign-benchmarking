@@ -14,9 +14,9 @@ METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 
 # TODO move to config
-METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
+METRIC_COMPARISONS1 = ['l2_norm', 'l2_norm']
 # TODO move to config
-METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
+METRIC_COMPARISONS2 = ['absolute_error', 'auprc']
 
 RANKS = config["ranks"]
 
@@ -24,10 +24,18 @@ RANKS = config["ranks"]
 #
 
 # TODO this is not the most efficient way...
-SIM, DT = [[filtered_list[i] for filtered_list in filter(lambda x: x[2] in {'fq', 'fq.gz'}, zip(SIM, DT, EXT))] for i in range(2)]
+SIM, DT, NUM = [[filtered_list[i] for filtered_list in filter(lambda x: x[3] in {'fq', 'fq.gz'}, zip(SIM, DT, NUM, EXT))] for i in range(3)]
 
 # TODO this is not the most efficient way...
 EXP_RANK, EXP_MET = [[prod[i] for prod in product(RANKS, METRICS)] for i in range(2)]
+
+
+NUM_FOR_SIM = {sim: set() for sim in set(SIM)}
+for sim, num in zip(SIM, NUM):
+    NUM_FOR_SIM[sim].add(num)
+
+print(NUM_FOR_SIM)
+print(sorted(set(NUM)))
 
 localrules: all, all_plots, all_metric_plots, unzip
 
@@ -39,13 +47,14 @@ rule all:
                simname=SIM * len(METRICS) * len(RANKS),
                datetime=DT * len(METRICS) * len(RANKS),
                rank=EXP_RANK * len(SIM),
-               metric=EXP_MET * len(SIM))
+               metric=EXP_MET * len(SIM)),
+        expand("analyses/all/plots/all_samples.{rank}.{metric}.svg", rank=RANKS, metric=METRICS)
 
 
 rule all_plots:
     input:
-        expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=sorted(set(NUM))),
-        expand("analyses/{{simname}}/plots/{{datetime}}_sample_all.{{rank}}.{metric}.svg", metric=METRICS)
+        lambda wildcards: expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=sorted(NUM_FOR_SIM[wildcards.simname])),
+        "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg",
     output:
         temp("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done")
     shell:
@@ -76,9 +85,18 @@ rule metric_comparison_plotting:
 
 rule method_comparison_plotting:
     input:
-        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=NUM)
+        lambda wildcards: expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=sorted(NUM_FOR_SIM[wildcards.simname]))
     output:
         "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg"
+    run:
+        plotting.method_comparison_plot(input, str(output))
+
+
+rule method_comparison_plotting_all_sims:
+    input:
+        expand("analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{{rank}}.{{metric}}.txt", zip, simname=SIM, datetime=DT, sample_num=NUM)
+    output:
+        "analyses/all/plots/all_samples.{rank}.{metric}.svg"
     run:
         plotting.method_comparison_plot(input, str(output))
 
