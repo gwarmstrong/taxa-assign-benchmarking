@@ -1,5 +1,4 @@
 import unittest
-import pandas as pd
 import numpy as np
 
 from benchutils.metrics import l2_norm, auprc, correlation, rmse
