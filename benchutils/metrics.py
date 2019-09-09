@@ -2,7 +2,7 @@ import pandas as pd
 from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
-from scipy.stats import pearsonr
+from scipy.stats import pearsonr, entropy
 from sklearn.metrics import auc, precision_recall_curve
 
 
@@ -88,6 +88,26 @@ def auprc(observed, expected):
     precision, recall, _ = precision_recall_curve(expected, observed)
     auprc_ = auc(recall, precision)
     return auprc_
+
+
+def kl_divergence(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array
+        The profile obtained by running a profiling method
+    expected : np.array
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The KL divergence from the observed distribution to the expected
+        distribution
+
+    """
+    return entropy(expected, observed)
 
 
 def _get_column_name(prefix, suffix):
@@ -209,4 +229,5 @@ def profile_error(observed_files, expected_file, output_file, rank,
 available_metrics = {'correlation': correlation,
                      'l2_norm': l2_norm,
                      'auprc': auprc,
-                     'absolute_error': rmse}
+                     'absolute_error': rmse,
+                     'kl_divergence': kl_divergence}

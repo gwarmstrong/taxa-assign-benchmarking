@@ -20,4 +20,4 @@ dependencies:
      - caffe2
      - pip:
             - tb-nightly
-            - "--editable=git+https://github.com/gwarmstrong/mohawk.git"
+            - "--editable=/home/garmstro/gwarmstrong-repos/mohawk"
