@@ -2,7 +2,8 @@ import pandas as pd
 from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
-from scipy.stats import pearsonr
+
+from scipy.stats import pearsonr as scipy_pearsonr
 from sklearn.metrics import (precision_score, recall_score, f1_score, auc,
                              precision_recall_curve)
 
@@ -72,9 +73,9 @@ def rmse(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -88,14 +89,14 @@ def rmse(observed, expected):
     return np.sqrt(np.mean((observed - expected) ** 2))
 
 
-def correlation(observed, expected):
+def pearsonr(observed, expected):
     """
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -104,7 +105,7 @@ def correlation(observed, expected):
         The Pearson correlation between the series
 
     """
-    return pearsonr(observed, expected)[0]
+    return scipy_pearsonr(observed, expected)[0]
 
 
 def l1_norm(observed, expected):
@@ -131,9 +132,9 @@ def l2_norm(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -150,9 +151,9 @@ def auprc(observed, expected):
 
     Parameters
     ----------
-    observed : np.array, pd.Series
+    observed : np.array
         The profile obtained by running a profiling method
-    expected : np.array, pd.Series
+    expected : np.array
         The ground truth relative abundance
 
     Returns
@@ -184,7 +185,6 @@ def _load_df(file_, rank, suffix, prefix='', skiprows=0):
     df = df[['PERCENTAGE']]
     percentage_name = _get_column_name(prefix, suffix)
     df = df.rename(columns={'PERCENTAGE': percentage_name})
-    print(df.columns)
     return df
 
 
@@ -276,7 +276,8 @@ def profile_error(observed_files, expected_file, output_file, rank,
     # TODO maybe take difference from sum to 100 as unassigned
 
     func = available_metrics[metric]
-    results = [func(profile, expected_profile)
+    results = [func(profile.values.flatten(),
+                    expected_profile.values.flatten())
                for _, profile in observed_profiles.iteritems()]
     results = pd.Series(results, name=metric,
                         index=observed_profiles.columns)
@@ -284,10 +285,10 @@ def profile_error(observed_files, expected_file, output_file, rank,
     results.to_csv(output_file, sep='\t')
 
 
-available_metrics = {'precision': precision,
+available_metrics = {'pearsonr': pearsonr,
+                     'precision': precision,
                      'recall': recall,
                      'f1': f1,
-                     'correlation': correlation,
                      'l1_norm': l1_norm,
                      'l2_norm': l2_norm,
                      'auprc': auprc,

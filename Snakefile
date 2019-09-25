@@ -1,27 +1,33 @@
 from benchutils import metrics, plotting, transformers
+from itertools import product
 
 # TODO move to config
 filename = "anonymous_reads"
-(SIM, DT, NUM, _) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
+(SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
-SIM = sorted(set(SIM))
-DT = sorted(set(DT))
-NUM = sorted(set(NUM))
+# this sorting does not account for different DT's and sample_nums for different simulations...
 
-# TODO move to config
-METHODS = ["kraken2", "metaphlan2"] # "shogun"]
-
-# TODO move to config
-METRICS = ['precision', 'recall', 'f1', 'correlation', 'l1_norm', 'l2_norm', 'auprc', 'absolute_error']
-
-# TODO move to config
-METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
-# TODO move to config
-METRIC_COMPARISONS2 = ['absolute_error', 'correlation']
-
+METHODS = config["methods"]
+METRICS = config["metrics"]
+METRIC_COMPARISONS1 = config["metric_comparisons1"]
+METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
+
+# TODO this is not the most efficient way...
+SIM, DT, NUM = [[filtered_list[i] for filtered_list in filter(lambda x: x[3] in {'fq', 'fq.gz'}, zip(SIM, DT, NUM, EXT))] for i in range(3)]
+
+# TODO this is not the most efficient way...
+EXP_RANK, EXP_MET = [[prod[i] for prod in product(RANKS, METRICS)] for i in range(2)]
+
+
+NUM_FOR_SIM = {sim: set() for sim in set(SIM)}
+for sim, num in zip(SIM, NUM):
+    NUM_FOR_SIM[sim].add(num)
+
+print(NUM_FOR_SIM)
+print(sorted(set(NUM)))
 
 localrules: all, all_plots, all_metric_plots, unzip
 
@@ -29,17 +35,18 @@ localrules: all, all_plots, all_metric_plots, unzip
 rule all:
     # TODO input can understand if/else, could be useful for only including some parts of pipeline
     input:
-        expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done",
-               simname=SIM,
-               datetime=DT,
-               rank=RANKS,
-               metric=METRICS)
+        expand("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done", zip,
+               simname=SIM * len(METRICS) * len(RANKS),
+               datetime=DT * len(METRICS) * len(RANKS),
+               rank=EXP_RANK * len(SIM),
+               metric=EXP_MET * len(SIM)),
+        expand("analyses/all/plots/all_samples.{rank}.{metric}.svg", rank=RANKS, metric=METRICS)
 
 
 rule all_plots:
     input:
-        expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=NUM),
-        expand("analyses/{{simname}}/plots/{{datetime}}_sample_all.{{rank}}.{metric}.svg", metric=METRICS)
+        lambda wildcards: expand("analyses/{{simname}}/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.done", sample_num=sorted(NUM_FOR_SIM[wildcards.simname])),
+        "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg",
     output:
         temp("analyses/{simname}/{datetime}_sample_all.{rank}.{metric}.done")
     shell:
@@ -70,9 +77,18 @@ rule metric_comparison_plotting:
 
 rule method_comparison_plotting:
     input:
-        expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=NUM)
+        lambda wildcards: expand("analyses/{{simname}}/summaries/{{datetime}}_sample_{sample_num}.{{rank}}.{{metric}}.txt", sample_num=sorted(NUM_FOR_SIM[wildcards.simname]))
     output:
         "analyses/{simname}/plots/{datetime}_sample_all.{rank}.{metric}.svg"
+    run:
+        plotting.method_comparison_plot(input, str(output))
+
+
+rule method_comparison_plotting_all_sims:
+    input:
+        expand("analyses/{simname}/summaries/{datetime}_sample_{sample_num}.{{rank}}.{{metric}}.txt", zip, simname=SIM, datetime=DT, sample_num=NUM)
+    output:
+        "analyses/all/plots/all_samples.{rank}.{metric}.svg"
     run:
         plotting.method_comparison_plot(input, str(output))
 
@@ -105,7 +121,7 @@ rule kraken2:
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}"
+        "kraken2 --db {config[kraken2_db]} --use-names --report {output.all} {input}"
 
 
 rule metaphlan2_transformer:
@@ -139,11 +155,11 @@ rule shogun:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
-        expand("analyses/{{simname}}/profiles/shogun/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+        expand("analyses/{{simname}}/profiles/shogun/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "touch {output}"
+        "echo '' > {output}"
 
 
 rule unzip:
