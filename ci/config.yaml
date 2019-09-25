@@ -1,4 +1,4 @@
-kraken_db:
+kraken2_db:
     "/path/to/db"
 ranks:
     # if not in a list, it will mess up
