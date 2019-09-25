@@ -14,7 +14,6 @@ METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
-#
 
 # TODO this is not the most efficient way...
 SIM, DT, NUM = [[filtered_list[i] for filtered_list in filter(lambda x: x[3] in {'fq', 'fq.gz'}, zip(SIM, DT, NUM, EXT))] for i in range(3)]

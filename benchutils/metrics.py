@@ -2,8 +2,70 @@ import pandas as pd
 from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
+
 from scipy.stats import pearsonr as scipy_pearsonr
-from sklearn.metrics import auc, precision_recall_curve
+from sklearn.metrics import (precision_score, recall_score, f1_score, auc,
+                             precision_recall_curve)
+
+
+def precision(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The precision score with > 0 positive, and negative otherwise
+
+    """
+    return precision_score((expected > 0).astype(float),
+                           (observed > 0).astype(float))
+
+
+def recall(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The recall score with > 0 positive, and negative otherwise
+
+    """
+    return recall_score((expected > 0).astype(float),
+                        (observed > 0).astype(float))
+
+
+def f1(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The F1 score with > 0 positive, and negative otherwise
+
+    """
+    return f1_score((expected > 0).astype(float),
+                    (observed > 0).astype(float))
 
 
 def rmse(observed, expected):
@@ -46,6 +108,25 @@ def pearsonr(observed, expected):
     return scipy_pearsonr(observed, expected)[0]
 
 
+def l1_norm(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array, pd.Series
+        The profile obtained by running a profiling method
+    expected : np.array, pd.Series
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The l1_norm between the series
+
+    """
+    return norm(observed - expected, ord=1)
+
+
 def l2_norm(observed, expected):
     """
 
@@ -78,7 +159,7 @@ def auprc(observed, expected):
     Returns
     -------
     float
-        The AUPRC with expected > 0 positvie, and negative otherwise
+        The AUPRC with expected > 0 positive, and negative otherwise
 
     """
     expected = (expected > 0).astype(float)
@@ -204,7 +285,13 @@ def profile_error(observed_files, expected_file, output_file, rank,
     results.to_csv(output_file, sep='\t')
 
 
+
 available_metrics = {'pearsonr': pearsonr,
+                     'precision': precision,
+                     'recall': recall,
+                     'f1': f1,
+                     'correlation': correlation,
+                     'l1_norm': l1_norm,
                      'l2_norm': l2_norm,
                      'auprc': auprc,
                      'absolute_error': rmse}
