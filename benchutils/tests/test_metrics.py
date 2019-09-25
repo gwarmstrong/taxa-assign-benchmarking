@@ -2,10 +2,38 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from benchutils.metrics import l2_norm, auprc, correlation, rmse
+from benchutils.metrics import (precision, recall, f1, l1_norm, l2_norm, auprc,
+                                correlation, rmse)
 
 
 class TestMetrics(unittest.TestCase):
+
+    def test_precision_basic(self):
+        exp_profile = pd.Series([0.3, 0.4, 0.1, 0.2, 0])
+        obs_profile = pd.Series([0.3, 0, 0.2, 0.2, 0.1])
+        # calculate precision by hand
+        expected = ((exp_profile > 0) & (obs_profile > 0)).sum() / \
+                   (obs_profile > 0).sum()
+        observed = precision(obs_profile, exp_profile)
+        self.assertAlmostEqual(observed, expected)
+
+    def test_recall_basic(self):
+        exp_profile = pd.Series([0.3, 0.4, 0.1, 0.2, 0])
+        obs_profile = pd.Series([0.3, 0, 0.2, 0, 0.5])
+        # calculate recall by hand
+        expected = ((exp_profile > 0) & (obs_profile > 0)).sum() / \
+                   (exp_profile > 0).sum()
+        observed = recall(obs_profile, exp_profile)
+        self.assertAlmostEqual(observed, expected)
+
+    def test_f1_basic(self):
+        exp_profile = pd.Series([0, 0.4, 0, 0.1, 0.5])
+        obs_profile = pd.Series([0.3, 0.2, 0, 0.2, 0.1])
+        # calculate F1 score by hand
+        expected = ((exp_profile > 0) & (obs_profile > 0)).sum() * 2 / \
+                   ((exp_profile > 0).sum() + (obs_profile > 0).sum())
+        observed = f1(obs_profile, exp_profile)
+        self.assertAlmostEqual(observed, expected)
 
     def test_auprc_basic(self):
         exp_profile = pd.Series([0.5, 0.4, 0.1, 0])
@@ -30,10 +58,19 @@ class TestMetrics(unittest.TestCase):
         observed_correlation = correlation(obs_profile, exp_profile)
         self.assertAlmostEqual(observed_correlation, expected_correlation)
 
+    def test_l1_norm_basic(self):
+        input_ = pd.Series([0, 0.1, 0.3, 0.1, 0.5])
+        output = pd.Series([0.2, 0, 0, 0.4, 0.4])
+        # calculate L1 norm by hand
+        expected = np.sum(np.absolute(input_ - output))
+        observed = l1_norm(input_, output)
+        self.assertAlmostEqual(observed, expected)
+
     def test_l2_norm_basic(self):
-        input_ = pd.Series([1, 0])
-        output = pd.Series([0, 0])
-        expected = 1
+        input_ = pd.Series([0.2, 0.3, 0.4, 0, 0.1])
+        output = pd.Series([0, 0.6, 0, 0.3, 0.1])
+        # calculate L2 norm by hand
+        expected = np.sqrt(np.sum(np.square(input_ - output)))
         observed = l2_norm(input_, output)
         self.assertAlmostEqual(observed, expected)
 

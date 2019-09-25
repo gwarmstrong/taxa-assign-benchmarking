@@ -12,7 +12,7 @@ NUM = sorted(set(NUM))
 METHODS = ["kraken2", "metaphlan2"] # "shogun"]
 
 # TODO move to config
-METRICS = ['correlation', 'l2_norm', 'auprc', 'absolute_error']
+METRICS = ['precision', 'recall', 'f1', 'correlation', 'l1_norm', 'l2_norm', 'auprc', 'absolute_error']
 
 # TODO move to config
 METRIC_COMPARISONS1 = ['l2_norm', 'absolute_error']
