@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import pandas as pd
 
 from benchutils.metrics import (precision, recall, f1, l1_norm, l2_norm, auprc,
                                 pearsonr, rmse)
