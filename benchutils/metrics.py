@@ -285,12 +285,10 @@ def profile_error(observed_files, expected_file, output_file, rank,
     results.to_csv(output_file, sep='\t')
 
 
-
 available_metrics = {'pearsonr': pearsonr,
                      'precision': precision,
                      'recall': recall,
                      'f1': f1,
-                     'correlation': correlation,
                      'l1_norm': l1_norm,
                      'l2_norm': l2_norm,
                      'auprc': auprc,
