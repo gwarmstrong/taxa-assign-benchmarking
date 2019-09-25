@@ -122,7 +122,7 @@ rule kraken2:
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}"
+        "kraken2 --db {config[kraken2_db]} --use-names --report {output.all} {input}"
 
 
 rule metaphlan2_transformer:

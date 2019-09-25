@@ -2,7 +2,7 @@ import pandas as pd
 from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
-from scipy.stats import pearsonr
+from scipy.stats import pearsonr as scipy_pearsonr
 from sklearn.metrics import auc, precision_recall_curve
 
 
@@ -27,7 +27,7 @@ def rmse(observed, expected):
     return np.sqrt(np.mean((observed - expected) ** 2))
 
 
-def correlation(observed, expected):
+def pearsonr(observed, expected):
     """
 
     Parameters
@@ -43,9 +43,7 @@ def correlation(observed, expected):
         The Pearson correlation between the series
 
     """
-    observed = np.array(observed)
-    expected = np.array(expected)
-    return pearsonr(observed, expected)[0]
+    return scipy_pearsonr(observed, expected)[0]
 
 
 def l2_norm(observed, expected):
@@ -206,7 +204,7 @@ def profile_error(observed_files, expected_file, output_file, rank,
     results.to_csv(output_file, sep='\t')
 
 
-available_metrics = {'correlation': correlation,
+available_metrics = {'pearsonr': pearsonr,
                      'l2_norm': l2_norm,
                      'auprc': auprc,
                      'absolute_error': rmse}
