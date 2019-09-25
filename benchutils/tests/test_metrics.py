@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from benchutils.metrics import l2_norm, auprc, correlation, rmse
+from benchutils.metrics import l2_norm, auprc, pearsonr, rmse
 
 
 class TestMetrics(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestMetrics(unittest.TestCase):
         observed_auprc = auprc(obs_profile, exp_profile)
         self.assertAlmostEqual(observed_auprc, expected_auprc)
 
-    def test_correlation_basic(self):
+    def test_pearsonr_basic(self):
         exp_profile_orig = np.array([0.5, 0.4, 0.1, 0])
         obs_profile = np.array([0.4, 0.3, 0.05, 0.25])
 
@@ -27,9 +27,9 @@ class TestMetrics(unittest.TestCase):
                          ((obs_profile - obs_profile.mean()) ** 2).sum()
 
         denominator = np.sqrt(denominator_sq)
-        expected_correlation = numerator / denominator
-        observed_correlation = correlation(obs_profile, exp_profile_orig)
-        self.assertAlmostEqual(observed_correlation, expected_correlation)
+        expected_pearsonr = numerator / denominator
+        observed_pearsonr = pearsonr(obs_profile, exp_profile_orig)
+        self.assertAlmostEqual(observed_pearsonr, expected_pearsonr)
 
     def test_l2_norm_basic(self):
         input_ = np.array([1, 0])
@@ -58,7 +58,7 @@ class TestProfileError(unittest.TestCase):
     def test_runs_metric_auprc(self):
         pass
 
-    def test_runs_metric_correlation(self):
+    def test_runs_metric_pearsonr(self):
         pass
 
     def test_runs_metric_rmse(self):
