@@ -76,10 +76,10 @@ def mohawk_transformer(per_read_summary, output_summary):
     # TODO this is a work in progress, concurrent with the stage of mohawk
     all_reads = pd.read_csv(per_read_summary, sep='\t')
     vc = all_reads.iloc[:, 1].value_counts()
-    df = pd.DataFrame(100 * vc / vc.sum())
+    df = pd.DataFrame(vc / vc.sum())
     # zero out entries less than 1/10 of a percent
-    df = (df > 0.1) * df
-    df = df / df.sum()
+    df = (df > 0.001) * df
+    df = 100 * df / df.sum()
     df.columns = ['PERCENTAGE']
     df.index.name = '@@TAXID'
     df.reset_index(inplace=True)
