@@ -57,7 +57,10 @@ def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
 
 def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
     all_ranks = pd.read_csv(all_rank_summary, sep='\t', skiprows=3)
-    def last_entry(x): return x.split('|')[-1]
+
+    def last_entry(x):
+        return x.split('|')[-1]
+
     all_ranks['last_clade'] = all_ranks['#clade_name'].map(last_entry)
     all_ranks['@@TAXID'] = all_ranks['NCBI_tax_id'].map(last_entry)
     all_ranks['RANK'] = all_ranks['last_clade'].map(
