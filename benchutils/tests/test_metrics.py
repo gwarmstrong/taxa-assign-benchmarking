@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 from benchutils.metrics import (precision, recall, f1, l1_norm, l2_norm, auprc,
-                                pearsonr, rmse)
+                                pearsonr, rmse, profile_error)
+from benchutils.tests import testbase
 
 
 class TestMetrics(unittest.TestCase):
@@ -92,7 +93,7 @@ class TestMetrics(unittest.TestCase):
 
 
 # TODO test these (blocked by unittest filesystem)
-class TestProfileError(unittest.TestCase):
+class TestProfileError(testbase.BaseTestCase):
 
     def test_errors_metric_not_in_available_metrics(self):
         pass
