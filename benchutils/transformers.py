@@ -73,3 +73,23 @@ def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
         sub_df = all_ranks.loc[all_ranks['RANK'] == rank]
         sub_df_matching = sub_df[keep_cols]
         sub_df_matching.to_csv(output_, sep='\t', index=False)
+
+
+def mohawk_transformer(per_read_summary, output_summary):
+    # TODO this is a work in progress, concurrent with the stage of mohawk
+    all_reads = pd.read_csv(per_read_summary, sep='\t')
+    vc = all_reads.iloc[:, 1].value_counts()
+    df = pd.DataFrame(vc / vc.sum())
+    # zero out entries less than 1/10 of a percent
+    df = (df > 0.001) * df
+    df = 100 * df / df.sum()
+    df.columns = ['PERCENTAGE']
+    df.index.name = '@@TAXID'
+    df.reset_index(inplace=True)
+    df['RANK'] = 'genus'
+    df['TAXNAME'] = 'blank'
+
+    keep_cols = ['@@TAXID', 'RANK', 'TAXNAME', 'PERCENTAGE']
+
+    df = df[keep_cols]
+    df.to_csv(output_summary, sep='\t', index=False)

@@ -12,6 +12,7 @@ METRICS = config["metrics"]
 METRIC_COMPARISONS1 = config["metric_comparisons1"]
 METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
+MOHAWK_MODEL = config["mohawk_model"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
 
@@ -138,8 +139,6 @@ rule metaphlan2:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
         "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
-    resources:
-        mem_gb=64
     conda:
         "envs/taxa-benchmark.yml"
     shell:
@@ -149,6 +148,30 @@ rule metaphlan2:
         metaphlan2.py {input} --input_type fastq --tax_lev 'a' > {output}        
         """
 
+rule mohawk_transformer:
+    input:
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+    output:
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus.profile.txt"
+    run:
+        transformers.mohawk_transformer(str(input), str(output))
+
+rule mohawk:
+    input:
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
+    params:
+        model = MOHAWK_MODEL
+    output:
+        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+    conda:
+        "envs/mohawk.yml"
+    shell:
+        """
+        mohawk classify --model {params.model} \
+            --sequence-file {input} \
+            --output-file {output} \
+            --length 150
+        """
 
 rule shogun:
     # TODO finish rule
