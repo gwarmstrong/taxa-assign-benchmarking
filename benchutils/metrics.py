@@ -182,8 +182,8 @@ def kl_divergence(observed, expected):
     Returns
     -------
     float
-        The KL divergence from the observed distribution to the expected
-        distribution
+        The Kullback-Leibler divergence from the observed distribution
+        to the expected distribution
 
     """
     return entropy(expected, observed)
