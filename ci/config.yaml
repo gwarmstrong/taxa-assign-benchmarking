@@ -4,7 +4,7 @@ ranks:
     # if not in a list, it will mess up
     ["genus", "species"]
 methods:
-  ["kraken2", "metaphlan2"] # "shogun"]
+  ["kraken2", "metaphlan2", "mohawk"] # "shogun"]
 metrics:
   ['correlation', 'l2_norm', 'auprc', 'absolute_error']
 metric_comparisons1:
