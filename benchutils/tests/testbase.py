@@ -1,5 +1,6 @@
 import unittest
 import pkg_resources
+import benchutils
 import os
 
 
@@ -10,8 +11,8 @@ class BaseTestCase(unittest.TestCase):
 
     def get_data_path(self, filename):
         # adapted from qiime2.plugin.testing.TestPluginBase and biocore/unifrac
-        return pkg_resources.resource_filename(self.package,
-                                               'data/%s' % filename)
+        return pkg_resources.resource_filename(benchutils.__name__,
+                                               'tests/data/%s' % filename)
 
     def create_data_path(self, filename):
         path = self.get_data_path(filename)
