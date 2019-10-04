@@ -219,7 +219,6 @@ def _load_observed_profiles(observed_files, rank, methods, prefix=''):
     # merge a bunch of dataframes loaded with `load_observed_single_profile
     dfs = []
     for observed_file, method in zip(observed_files, methods):
-        assert method in observed_file
         dfs.append(_load_observed_single_profile(observed_file,
                                                  rank,
                                                  suffix=method,

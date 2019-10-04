@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 from benchutils.metrics import (precision, recall, f1, l1_norm, l2_norm, auprc,
-                                pearsonr, rmse)
+                                pearsonr, rmse, profile_error)
+from benchutils.tests import testbase
 
 
 class TestMetrics(unittest.TestCase):
@@ -92,31 +93,80 @@ class TestMetrics(unittest.TestCase):
 
 
 # TODO test these (blocked by unittest filesystem)
-class TestProfileError(unittest.TestCase):
+class TestProfileError(testbase.BaseTestCase):
+
+    def setUp(self):
+        super(TestProfileError, self).setUp()
+        self.exp = self.get_data_path('expected_genus_profile.txt')
+        self.obs1 = self.get_data_path('sample_genus_profile1.txt')
+        self.obs2 = self.get_data_path('sample_genus_profile2.txt')
 
     def test_errors_metric_not_in_available_metrics(self):
-        pass
+        with self.assertRaisesRegex(ValueError, 'not in available metrics'):
+            profile_error('foo', 'bar', 'baz', rank='genus',
+                          methods='qux', metric='quux')
 
     def test_errors_rank_not_in_ranks(self):
-        pass
+        with self.assertRaisesRegex(ValueError, 'not in available ranks'):
+            profile_error('foo', 'bar', 'baz', rank='qux', methods='quux',
+                          metric='f1')
 
     def test_runs_metric_auprc(self):
-        pass
+        out1 = self.create_data_path('test_runs_with_metric_auprc1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_auprc2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='auprc', metric='auprc')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['auprc', 'auprc'], metric='auprc')
 
     def test_runs_metric_pearsonr(self):
-        pass
+        out1 = self.create_data_path('test_runs_with_metric_pearsonr1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_pearsonr2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='pearsonr', metric='pearsonr')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['pearsonr', 'pearsonr'], metric='pearsonr')
 
     def test_runs_metric_rmse(self):
-        pass
+        out1 = self.create_data_path('test_runs_with_metric_rmse1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_rmse2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='absolute_error', metric='absolute_error')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['absolute_error', 'absolute_error'],
+                      metric='absolute_error')
+
+    def test_runs_metric_l1_norm(self):
+        out1 = self.create_data_path('test_runs_with_metric_l1_norm1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_l1_norm2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='l1_norm', metric='l1_norm')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['l1_norm', 'l1_norm'], metric='l1_norm')
 
     def test_runs_metric_l2_norm(self):
-        pass
+        out1 = self.create_data_path('test_runs_with_metric_l2_norm1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_l2_norm2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='l2_norm', metric='l2_norm')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['l2_norm', 'l2_norm'], metric='l2_norm')
 
-    def test_runs_with_list(self):
-        pass
+    def test_runs_metric_precision(self):
+        out1 = self.create_data_path('test_runs_with_metric_precision1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_precision2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='precision', metric='precision')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['precision', 'precision'], metric='precision')
 
-    def test_runs_with_string(self):
-        pass
+    def test_runs_metric_recall(self):
+        out1 = self.create_data_path('test_runs_with_metric_recall1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_recall2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='recall', metric='recall')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['recall', 'recall'], metric='recall')
 
 
 if __name__ == '__main__':

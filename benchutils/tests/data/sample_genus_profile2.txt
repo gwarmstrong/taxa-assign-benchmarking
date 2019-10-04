@@ -1,0 +1,4 @@
+@@TAXID	RANK	TAXNAME	PERCENTAGE
+1	genus	blank	65
+2	genus	blank	10
+4	genus	blank	25

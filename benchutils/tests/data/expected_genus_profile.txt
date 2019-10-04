@@ -1,0 +1,9 @@
+@SampleID:
+@Version:0.9.1
+@Ranks:superkingdom|phylum|class|order|family|genus|species|strain
+
+@@TAXID	RANK	TAXPATH	TAXPATHSN	PERCENTAGE	_CAMI_genomeID	_CAMI_OTU
+1	genus	9|8|7|6|5|1	Bacteria|blah8|blah7|blah6|blah5|blah1	50
+2	genus	9|8|7|6|5|2	Bacteria|blah8|blah7|blah6|blah5|blah2	20
+3	genus	9|8|7|6|5|3	Bacteria|blah8|blah7|blah6|blah5|blah3	20
+4	genus	9|8|7|6|5|4	Bacteria|blah8|blah7|blah6|blah5|blah4	10
