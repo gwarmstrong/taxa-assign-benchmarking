@@ -14,7 +14,6 @@ METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
-#
 
 # TODO this is not the most efficient way...
 SIM, DT, NUM = [[filtered_list[i] for filtered_list in filter(lambda x: x[3] in {'fq', 'fq.gz'}, zip(SIM, DT, NUM, EXT))] for i in range(3)]
@@ -122,7 +121,7 @@ rule kraken2:
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "kraken2 --db {config[kraken_db]} --use-names --report {output.all} {input}"
+        "kraken2 --db {config[kraken2_db]} --use-names --report {output.all} {input}"
 
 
 rule metaphlan2_transformer:
@@ -152,25 +151,25 @@ rule mohawk_transformer:
     input:
         "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     output:
-        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus.profile.txt"
+        "analyses/{simname}/profiles/CNN/{datetime}_sample_{sample_num}.genus.profile.txt"
     run:
         transformers.mohawk_transformer(str(input), str(output))
 
 rule mohawk:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
+    params:
+        model = "/home/garmstro/gwarmstrong-repos/mohawk/runs/Sep05_16-33-46_brncl-34.ucsd.edu/models/trained_model_epoch_25_seed_1234.mod"
     output:
         "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     conda:
         "envs/mohawk.yml"
     shell:
         """
-        mohawk classify \
-            --model /home/garmstro/gwarmstrong-repos/mohawk/runs/Sep05_16-33-46_brncl-34.ucsd.edu/models/trained_model_epoch_25_seed_1234.mod \
+        mohawk classify --model {params.model} \
             --sequence-file {input} \
-            --length 150 \
-            --batch-size 640 \
-            --output-file {output}
+            --output-file {output} \
+            --length 150
         """
 
 rule shogun:

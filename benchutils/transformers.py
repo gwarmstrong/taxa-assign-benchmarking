@@ -57,7 +57,10 @@ def kraken2_transformer(all_rank_summary, output_rank_summaries, ranks):
 
 def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
     all_ranks = pd.read_csv(all_rank_summary, sep='\t', skiprows=3)
-    def last_entry(x): return x.split('|')[-1]
+
+    def last_entry(x):
+        return x.split('|')[-1]
+
     all_ranks['last_clade'] = all_ranks['#clade_name'].map(last_entry)
     all_ranks['@@TAXID'] = all_ranks['NCBI_tax_id'].map(last_entry)
     all_ranks['RANK'] = all_ranks['last_clade'].map(
@@ -75,11 +78,14 @@ def metaphlan2_transformer(all_rank_summary, output_rank_summaries, ranks):
 def mohawk_transformer(per_read_summary, output_summary):
     # TODO this is a work in progress, concurrent with the stage of mohawk
     all_reads = pd.read_csv(per_read_summary, sep='\t')
-    vc = all_reads.value_coutns()
-    df = pd.DataFrame(vc / vc.sum(), columns=['PERCENTAGE'])
-    df.index.name = ['@@TAXID']
+    vc = all_reads.iloc[:, 1].value_counts()
+    df = pd.DataFrame(vc / vc.sum())
+    # zero out entries less than 1/10 of a percent
+    df = (df > 0.001) * df
+    df = 100 * df / df.sum()
+    df.columns = ['PERCENTAGE']
+    df.index.name = '@@TAXID'
     df.reset_index(inplace=True)
-
     df['RANK'] = 'genus'
     df['TAXNAME'] = 'blank'
 
