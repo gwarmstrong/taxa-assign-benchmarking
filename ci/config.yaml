@@ -2,7 +2,7 @@ kraken2_db:
     "/path/to/db"
 ranks:
     # if not in a list, it will mess up
-    ["genus", "species"]
+    ["genus"]
 methods:
   ["kraken2", "metaphlan2", "mohawk"] # "shogun"]
 metrics:
