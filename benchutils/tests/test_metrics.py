@@ -96,10 +96,14 @@ class TestMetrics(unittest.TestCase):
 class TestProfileError(testbase.BaseTestCase):
 
     def test_errors_metric_not_in_available_metrics(self):
-        pass
+        with self.assertRaisesRegex(ValueError, 'not in available metrics'):
+            profile_error('foo', 'bar', 'baz', rank='genus',
+                          methods='qux', metric='quux')
 
     def test_errors_rank_not_in_ranks(self):
-        pass
+        with self.assertRaisesRegex(ValueError, 'not in available ranks'):
+            profile_error('foo', 'bar', 'baz', rank='qux', methods='quux',
+                          metric='f1')
 
     def test_runs_metric_auprc(self):
         pass
