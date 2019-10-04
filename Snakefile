@@ -12,6 +12,7 @@ METRICS = config["metrics"]
 METRIC_COMPARISONS1 = config["metric_comparisons1"]
 METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
+MOHAWK_MODEL = config["mohawk_model"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
 
@@ -159,7 +160,7 @@ rule mohawk:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     params:
-        model = "/home/garmstro/gwarmstrong-repos/mohawk/runs/Sep05_16-33-46_brncl-34.ucsd.edu/models/trained_model_epoch_25_seed_1234.mod"
+        model = MOHAWK_MODEL
     output:
         "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     conda:
