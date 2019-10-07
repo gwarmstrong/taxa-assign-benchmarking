@@ -13,3 +13,11 @@ metric_comparisons2:
   ['absolute_error', 'auprc']
 mohawk_model:
   "ci/test_model.mod"
+
+params:
+  {
+    "kraken2": [{"db": "/projects/genome_annotation/ref107/dbs/kraken2"},
+                {"db": "/projects/genome_annotation/ref107/dbs/kraken2_alt"}],
+    "metaphlan2": None,
+    "mohawk": [{"model": "/home/garmstro/gwarmstrong-repos/mohawk/runs/Sep05_16-33-46_brncl-34.ucsd.edu/models/trained_model_epoch_25_seed_1234.mod"}]
+  }
