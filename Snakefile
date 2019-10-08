@@ -14,7 +14,7 @@ for method in config["params"]:
         settings = config["params"][method]
         METHODS.extend(method + '_' + str(i) for i in list(range(len(settings))))
     else:
-        METHODS.append(method)
+        METHODS.append(method + '_0')
 
 METRICS = config["metrics"]
 METRIC_COMPARISONS1 = config["metric_comparisons1"]

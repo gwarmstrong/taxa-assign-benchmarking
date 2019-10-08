@@ -2,8 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-single_setting_models = {"metaphlan2"}
-
 
 def _metric_getter(x): return x.split('.')[-2]
 
@@ -145,8 +143,7 @@ def method_comparison_plot(list_of_files, output_file,
 
     # make plot containing all df's concatenated together
     measurements = pd.concat(dfs)
-    measurements['Method'] = ['_'.join(method.split('_')[:-1]) if method in
-                              single_setting_models else method for
+    measurements['Method'] = ['_'.join(method.split('_')[:-1]) for
                               method in measurements['method'].values]
 
     swarmplot_kwargs.update({'hue': 'Method'})
