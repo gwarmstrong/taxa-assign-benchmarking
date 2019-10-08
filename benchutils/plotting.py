@@ -143,7 +143,7 @@ def method_comparison_plot(list_of_files, output_file,
 
     # make plot containing all df's concatenated together
     measurements = pd.concat(dfs)
-    measurements['Method'] = ['_'.join(method.split('_')) for method in
+    measurements['Method'] = ['_'.join(method.split('_')[:-1]) for method in
                               measurements['method'].values]
 
     swarmplot_kwargs.update({'hue': 'Method'})
