@@ -19,7 +19,7 @@ script:
   - source activate test-env
   # setup dummy test data
   - chmod +x ci/setup_demo_data.sh
-  - ci/setup_demo_data.sh
+  - zsh ci/setup_demo_data.sh
   # snakemake dry run
   - snakemake -n -r --configfile ci/config.yaml
   # unit tests
