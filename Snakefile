@@ -199,3 +199,12 @@ rule unzip:
     shell:
         "gunzip {input}"
 
+rule copy_profiles:
+    input:
+        "data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
+    params:
+        loc = "analyses/{wildcards.simname}/profiles/{widlcards.method}/{wildcards.datetime}_sample_{widlcards.sample_num}.{wildcards.rank}.profile.txt"
+    output:
+        "analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
+    shell:
+        "cp {input} {params.loc}"
