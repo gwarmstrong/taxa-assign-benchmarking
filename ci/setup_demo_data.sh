@@ -9,4 +9,8 @@ echo '' > data/simulations/test-sim2/taxonomic_profile_0.txt
 echo '' > data/simulations/test-sim1/taxonomic_profile_1.txt
 echo '' > data/simulations/test-sim3/taxonomic_profile_0.txt
 mkdir -p data/profiles/test-sim{1,2,3}/blah/
-echo '' > data/profiles/test-sim{1,2,3}/blah/fake_date_sample_{0,1}.family.profile.txt
+echo '' > data/profiles/test-sim{1,2}/blah/fake_date_sample_{0,1}.family.profile.txt
+echo '' > data/profiles/test-sim{1,2}/blah/fake_date_sample_{0,1}.genus.profile.txt
+mkdir -p data/profiles/test-sim{1,2,3}/mohawk_{0,1,2,3}/
+echo '' > data/profiles/test-sim{1,2,3}/mohawk_{0,1,2,3}/fake_date_sample_{0,1}.family.profile.txt
+echo '' > data/profiles/test-sim3/mohawk_{0,1,2,3}/fake_date3_sample_0.family.profile.txt

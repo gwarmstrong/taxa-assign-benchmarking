@@ -199,12 +199,31 @@ rule unzip:
     shell:
         "gunzip {input}"
 
-rule copy_profiles:
-    input:
-        "data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
-    params:
-        loc = "analyses/{wildcards.simname}/profiles/{widlcards.method}/{wildcards.datetime}_sample_{widlcards.sample_num}.{wildcards.rank}.profile.txt"
-    output:
-        "analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
-    shell:
-        "cp {input} {params.loc}"
+SIMC, METHODC, DTC, SNC, RANKC = glob_wildcards("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt")
+input_profiles = expand("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                        simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+copied_profiles = expand("analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                         simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+
+print(input_profiles)
+print(copied_profiles)
+import os
+import shutil
+for src, dest in zip(input_profiles, copied_profiles):
+    if not os.path.isfile(dest):
+        if not os.path.isdir(os.path.dirname(dest)):
+            os.makedirs(os.path.dirname(dest))
+        shutil.copyfile(src, dest)
+
+# rule copy_profiles:
+#     input:
+#         "data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
+#     params:
+#         loc = "analyses/{wildcards.simname}/profiles/{widlcards.method}/{wildcards.datetime}_sample_{widlcards.sample_num}.{wildcards.rank}.profile.txt"
+#     output:
+#         temp("analyses/{simname}_profiles_{method}_{datetime}_sample_{sample_num}_{rank}_profile_copy.done")
+#     shell:
+#         """
+#         cp {input} {params.loc}
+#         echo '' > {output}
+#         """
