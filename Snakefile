@@ -1,11 +1,11 @@
 from benchutils import metrics, plotting, transformers
 from itertools import product
+import os
+import shutil
 
 # TODO move to config
 filename = "anonymous_reads"
 (SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
-
-# this sorting does not account for different DT's and sample_nums for different simulations... TODO 15
 
 # parse methods for settings
 METHODS = []
@@ -32,6 +32,18 @@ EXP_RANK, EXP_MET = [[prod[i] for prod in product(RANKS, METRICS)] for i in rang
 NUM_FOR_SIM = {sim: set() for sim in set(SIM)}
 for sim, num in zip(SIM, NUM):
     NUM_FOR_SIM[sim].add(num)
+
+# move input profiles into directory so they are found instead of running analysis to find them
+SIMC, METHODC, DTC, SNC, RANKC = glob_wildcards("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt")
+input_profiles = expand("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                        simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+copied_profiles = expand("analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                         simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+for src, dest in zip(input_profiles, copied_profiles):
+    if not os.path.isfile(dest):
+        if not os.path.isdir(os.path.dirname(dest)):
+            os.makedirs(os.path.dirname(dest))
+        shutil.copyfile(src, dest)
 
 
 localrules: all, all_plots, all_metric_plots, unzip
@@ -198,32 +210,3 @@ rule unzip:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     shell:
         "gunzip {input}"
-
-SIMC, METHODC, DTC, SNC, RANKC = glob_wildcards("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt")
-input_profiles = expand("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
-                        simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
-copied_profiles = expand("analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
-                         simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
-
-print(input_profiles)
-print(copied_profiles)
-import os
-import shutil
-for src, dest in zip(input_profiles, copied_profiles):
-    if not os.path.isfile(dest):
-        if not os.path.isdir(os.path.dirname(dest)):
-            os.makedirs(os.path.dirname(dest))
-        shutil.copyfile(src, dest)
-
-# rule copy_profiles:
-#     input:
-#         "data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt"
-#     params:
-#         loc = "analyses/{wildcards.simname}/profiles/{widlcards.method}/{wildcards.datetime}_sample_{widlcards.sample_num}.{wildcards.rank}.profile.txt"
-#     output:
-#         temp("analyses/{simname}_profiles_{method}_{datetime}_sample_{sample_num}_{rank}_profile_copy.done")
-#     shell:
-#         """
-#         cp {input} {params.loc}
-#         echo '' > {output}
-#         """
