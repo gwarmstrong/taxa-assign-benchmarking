@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 from benchutils.metrics import (precision, recall, f1, l1_norm, l2_norm, auprc,
-                                pearsonr, rmse, profile_error)
+                                pearsonr, spearmanr, rmse, profile_error)
 from benchutils.tests import testbase
 
 
@@ -60,6 +60,13 @@ class TestMetrics(unittest.TestCase):
         expected_pearsonr = numerator / denominator
         observed_pearsonr = pearsonr(obs_profile, exp_profile_orig)
         self.assertAlmostEqual(observed_pearsonr, expected_pearsonr)
+
+    def test_spearmanr_basic(self):
+        exp_profile = np.array([1, 2, 3, 4, 5])
+        obs_profile = np.array([5, 6, 7, 8, 7])
+        observed_spearmanr = spearmanr(obs_profile, exp_profile)
+        expected_spearmanr = 0.82078268166812329
+        self.assertAlmostEqual(observed_spearmanr, expected_spearmanr)
 
     def test_l1_norm_basic(self):
         input_ = pd.Series([0, 0.1, 0.3, 0.1, 0.5])
@@ -126,6 +133,14 @@ class TestProfileError(testbase.BaseTestCase):
                       methods='pearsonr', metric='pearsonr')
         profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
                       methods=['pearsonr', 'pearsonr'], metric='pearsonr')
+
+    def test_runs_metric_spearmanr(self):
+        out1 = self.create_data_path('test_runs_with_metric_spearmanr1.txt')
+        out2 = self.create_data_path('test_runs_with_metric_spearmanr2.txt')
+        profile_error(self.obs1, self.exp, out1, rank='genus',
+                      methods='spearmanr', metric='spearmanr')
+        profile_error([self.obs1, self.obs1], self.exp, out2, rank='genus',
+                      methods=['spearmanr', 'spearmanr'], metric='spearmanr')
 
     def test_runs_metric_rmse(self):
         out1 = self.create_data_path('test_runs_with_metric_rmse1.txt')
