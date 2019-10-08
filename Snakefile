@@ -133,9 +133,9 @@ rule kraken2:
 
 rule metaphlan2_transformer:
     input:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
+        "analyses/{simname}/profiles/metaphlan2_0/{datetime}_sample_{sample_num}._all.profile.txt",
     output:
-        expand("analyses/{{simname}}/profiles/metaphlan2/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+        expand("analyses/{{simname}}/profiles/metaphlan2_0/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
     run:
         transformers.metaphlan2_transformer(str(input), output, ranks=RANKS)
 
@@ -144,7 +144,7 @@ rule metaphlan2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
+        "analyses/{simname}/profiles/metaphlan2_0/{datetime}_sample_{sample_num}._all.profile.txt",
     conda:
         "envs/taxa-benchmark.yml"
     shell:
