@@ -1,18 +1,25 @@
 from benchutils import metrics, plotting, transformers
 from itertools import product
+import os
+import shutil
 
 # TODO move to config
 filename = "anonymous_reads"
 (SIM, DT, NUM, EXT) = glob_wildcards("data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".{extension}")
 
-# this sorting does not account for different DT's and sample_nums for different simulations...
+# parse methods for settings
+METHODS = []
+for method in config["params"]:
+    if isinstance(config["params"][method], list):
+        settings = config["params"][method]
+        METHODS.extend(method + '_' + str(i) for i in range(len(settings)))
+    else:
+        METHODS.append(method + '_0')
 
-METHODS = config["methods"]
 METRICS = config["metrics"]
 METRIC_COMPARISONS1 = config["metric_comparisons1"]
 METRIC_COMPARISONS2 = config["metric_comparisons2"]
 RANKS = config["ranks"]
-MOHAWK_MODEL = config["mohawk_model"]
 
 # TODO benchmarks for memory/time on rules (particularly assignment methods)
 
@@ -22,13 +29,22 @@ SIM, DT, NUM = [[filtered_list[i] for filtered_list in filter(lambda x: x[3] in 
 # TODO this is not the most efficient way...
 EXP_RANK, EXP_MET = [[prod[i] for prod in product(RANKS, METRICS)] for i in range(2)]
 
-
 NUM_FOR_SIM = {sim: set() for sim in set(SIM)}
 for sim, num in zip(SIM, NUM):
     NUM_FOR_SIM[sim].add(num)
 
-print(NUM_FOR_SIM)
-print(sorted(set(NUM)))
+# move input profiles into directory so they are found instead of running analysis to find them
+SIMC, METHODC, DTC, SNC, RANKC = glob_wildcards("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt")
+input_profiles = expand("data/profiles/{simname}/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                        simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+copied_profiles = expand("analyses/{simname}/profiles/{method}/{datetime}_sample_{sample_num}.{rank}.profile.txt", zip,
+                         simname=SIMC, method=METHODC, datetime=DTC, sample_num=SNC, rank=RANKC)
+for src, dest in zip(input_profiles, copied_profiles):
+    if not os.path.isfile(dest):
+        if not os.path.isdir(os.path.dirname(dest)):
+            os.makedirs(os.path.dirname(dest))
+        shutil.copyfile(src, dest)
+
 
 localrules: all, all_plots, all_metric_plots, unzip
 
@@ -107,29 +123,31 @@ rule benchmark_metrics:
 
 rule kraken2_transformer:
     input:
-        "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt"
+        "analyses/{simname}/profiles/kraken2_{num}/{datetime}_sample_{sample_num}._all.profile.txt"
     output:
-        expand("analyses/{{simname}}/profiles/kraken2/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
+        expand("analyses/{{simname}}/profiles/kraken2_{{num}}/{{datetime}}_sample_{{sample_num}}.{rank}.profile.txt", rank=RANKS)
     run:
         transformers.kraken2_transformer(str(input), output, ranks=RANKS)
 
 
 rule kraken2:
     input:
-        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
+        "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq",
+    params:
+        db = lambda wildcards, output: config["params"]["kraken2"][int(wildcards.num)]["db"]
     output:
-        all = "analyses/{simname}/profiles/kraken2/{datetime}_sample_{sample_num}._all.profile.txt",
+        all = "analyses/{simname}/profiles/kraken2_{num}/{datetime}_sample_{sample_num}._all.profile.txt",
     conda:
         "envs/taxa-benchmark.yml"
     shell:
-        "kraken2 --db {config[kraken2_db]} --use-names --report {output.all} {input}"
+        "kraken2 --db {params.db} --use-names --report {output.all} {input}"
 
 
 rule metaphlan2_transformer:
     input:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
+        "analyses/{simname}/profiles/metaphlan2_0/{datetime}_sample_{sample_num}._all.profile.txt",
     output:
-        expand("analyses/{{simname}}/profiles/metaphlan2/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
+        expand("analyses/{{simname}}/profiles/metaphlan2_0/{{datetime}}_sample_{{sample_num}}.{{rank}}.profile.txt", rank=RANKS)
     run:
         transformers.metaphlan2_transformer(str(input), output, ranks=RANKS)
 
@@ -138,7 +156,7 @@ rule metaphlan2:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     output:
-        "analyses/{simname}/profiles/metaphlan2/{datetime}_sample_{sample_num}._all.profile.txt",
+        "analyses/{simname}/profiles/metaphlan2_0/{datetime}_sample_{sample_num}._all.profile.txt",
     conda:
         "envs/taxa-benchmark.yml"
     shell:
@@ -150,9 +168,9 @@ rule metaphlan2:
 
 rule mohawk_transformer:
     input:
-        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+        "analyses/{simname}/profiles/mohawk_{num}/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     output:
-        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus.profile.txt"
+        "analyses/{simname}/profiles/mohawk_{num}/{datetime}_sample_{sample_num}.genus.profile.txt"
     run:
         transformers.mohawk_transformer(str(input), str(output))
 
@@ -160,9 +178,9 @@ rule mohawk:
     input:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     params:
-        model = MOHAWK_MODEL
+        model = lambda wildcards, output: config["params"]["mohawk"][int(wildcards.num)]["model"]
     output:
-        "analyses/{simname}/profiles/mohawk/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
+        "analyses/{simname}/profiles/mohawk_{num}/{datetime}_sample_{sample_num}.genus_raw.profile.txt",
     conda:
         "envs/mohawk.yml"
     shell:
@@ -192,4 +210,3 @@ rule unzip:
         "data/simulations/{simname}/{datetime}_sample_{sample_num}/reads/" + filename + ".fq"
     shell:
         "gunzip {input}"
-

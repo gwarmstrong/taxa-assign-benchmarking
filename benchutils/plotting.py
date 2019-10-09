@@ -143,6 +143,10 @@ def method_comparison_plot(list_of_files, output_file,
 
     # make plot containing all df's concatenated together
     measurements = pd.concat(dfs)
+    measurements['Method'] = ['_'.join(method.split('_')[:-1]) for
+                              method in measurements['method'].values]
+
+    swarmplot_kwargs.update({'hue': 'Method'})
     fig, ax = methods_swarmplot(measurements,
                                 swarmplot_kwargs=swarmplot_kwargs)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')

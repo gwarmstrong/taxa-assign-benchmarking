@@ -3,6 +3,7 @@ from benchutils import ranks
 import numpy as np
 from numpy.linalg import norm
 from scipy.stats import pearsonr as scipy_pearsonr
+from scipy.stats import spearmanr as scipy_spearmanr
 from scipy.stats import entropy
 from sklearn.metrics import (precision_score, recall_score, f1_score, auc,
                              precision_recall_curve)
@@ -106,6 +107,25 @@ def pearsonr(observed, expected):
 
     """
     return scipy_pearsonr(observed, expected)[0]
+
+
+def spearmanr(observed, expected):
+    """
+
+    Parameters
+    ----------
+    observed : np.array
+        The profile obtained by running a profiling method
+    expected : np.array
+        The ground truth relative abundance
+
+    Returns
+    -------
+    float
+        The Spearman correlation between the series
+
+    """
+    return scipy_spearmanr(observed, expected)[0]
 
 
 def l1_norm(observed, expected):
@@ -312,4 +332,5 @@ available_metrics = {'pearsonr': pearsonr,
                      'l2_norm': l2_norm,
                      'auprc': auprc,
                      'absolute_error': rmse,
-                     'kl_divergence': kl_divergence}
+                     'kl_divergence': kl_divergence,
+                     'spearmanr': spearmanr}

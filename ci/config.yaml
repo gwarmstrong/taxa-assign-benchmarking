@@ -1,15 +1,27 @@
-kraken2_db:
-    "/path/to/db"
 ranks:
-    # if not in a list, it will mess up
-    ["genus"]
+  # if not in a list, it will mess up (same for all below)
+  ["genus", "family"]
 methods:
-  ["kraken2", "metaphlan2", "mohawk"] # "shogun"]
+  ["kraken2", "metaphlan2", "mohawk", "blah"]
 metrics:
-  ['pearsonr', 'l2_norm', 'auprc', 'absolute_error']
+  ['pearsonr', 'l2_norm', 'l1_norm', 'auprc', 'absolute_error', 'kl_divergence', 'f1',
+   'precision', 'recall', 'spearmanr']
 metric_comparisons1:
   ['l2_norm', 'l2_norm']
 metric_comparisons2:
   ['absolute_error', 'auprc']
-mohawk_model:
-  "ci/test_model.mod"
+
+params:
+  {
+    "kraken2": [
+      {"db": "ci/dbs/kraken_db1"},
+      {"db": "ci/dbs/kraken_db2"}
+    ],
+    "metaphlan2": None,
+    "mohawk": [
+      {"model": "ci/dbs/test_mohawk1.mod"},
+      {"model": "ci/dbs/test_mohawk2.mod"},
+      {"model": "ci/dbs/test_mohawk3.mod"},
+      {"model": "ci/dbs/test_mohawk4.mod"}
+    ]
+  }
