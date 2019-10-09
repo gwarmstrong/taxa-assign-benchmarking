@@ -12,7 +12,7 @@ METHODS = []
 for method in config["params"]:
     if isinstance(config["params"][method], list):
         settings = config["params"][method]
-        METHODS.extend(method + '_' + str(i) for i in list(range(len(settings))))
+        METHODS.extend(method + '_' + str(i) for i in range(len(settings)))
     else:
         METHODS.append(method + '_0')
 
