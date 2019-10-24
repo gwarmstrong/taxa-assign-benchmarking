@@ -77,13 +77,13 @@ if args.brlen_cutoff is not None:
     print('Number of nodes: %d.' % tree.count())
 
 # assign node IDs if not already done
-if tree.name != 'N1':
+if tree.name is None:
     idx = 1
     for node in tree.levelorder():
-        if not node.is_tip():
-            node.name = 'N%d' % idx
+        if (node.name is None) and (not node.is_tip()):
+            node.name = 'Ext%d' % idx
             idx += 1
-    print('Internal node labels N1..N%d assigned.' % idx)
+    print('Internal node labels Ext1..Ext%d assigned.' % idx)
 
     tree.write(os.path.join(out_dir, 'tree.nids.nwk'))
 
